@@ -26,12 +26,6 @@ public class UtilityScript : MonoBehaviour, TileScript, IBuyTile
 		return GetOwner() != null;
 	}
 
-	//Assigns an owner to the tile.
-	public void SetOwner(PlayerScript player)
-	{
-		//
-	}
-
 	//Pay the player.
 	public void PayPlayer(PlayerScript player)
 	{

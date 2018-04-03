@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RailRoadScript : TileScript, IBuyTile
+public class RailRoadScript : MonoBehaviour, TileScript, IBuyTile
 {
 	private int[] rent;
 	private int rentIndex;
@@ -16,17 +16,6 @@ public class RailRoadScript : TileScript, IBuyTile
 	public bool IsOwned()
 	{
 		return true;
-	}
-
-	public override void Activate()
-	{
-		print("Activate not implemented");
-	}
-
-	//Set the owner.
-	public void SetOwner(PlayerScript player)
-	{
-		//
 	}
 
 	//Pay the player.
@@ -58,13 +47,13 @@ public class RailRoadScript : TileScript, IBuyTile
 	{
 		return rent[rentIndex];
 	}
-
+		
 	//Other methods:
 
 	//Upgrade the property by updating its price and house/hotel sprites.
 	public void Upgrade()
 	{
-		if(rentIndex != rent.Length)
+		if(rentIndex != rent.Length - 1)
 		{
 			rentIndex++;
 		}

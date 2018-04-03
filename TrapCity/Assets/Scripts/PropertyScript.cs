@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PropertyScript : TileScript, IBuyTile
+public class PropertyScript : MonoBehaviour, TileScript, IBuyTile
 {
 	private int[] rent;
 	private int rentIndex;
@@ -18,21 +18,10 @@ public class PropertyScript : TileScript, IBuyTile
 		return true;
 	}
 
-	public override void Activate()
-	{
-		print("Activate not implemented");
-	}
-
-	//Set the owner.
-	public void SetOwner(PlayerScript player)
-	{
-		//
-	}
-
 	//Pay the player.
 	public void PayPlayer(PlayerScript player)
 	{
-		player.AddCash(GetRent());
+		player.SetCash(player.GetCash() + GetRent());
 	}
 
 	//This property is now mortgaged.
@@ -64,7 +53,7 @@ public class PropertyScript : TileScript, IBuyTile
 	//Upgrade the property by updating its price and house/hotel sprites.
 	public void Upgrade()
 	{
-		if(rentIndex != rent.Length)
+		if(rentIndex != rent.Length - 1)
 		{
 			rentIndex++;
 		}
