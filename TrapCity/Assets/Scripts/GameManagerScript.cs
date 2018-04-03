@@ -9,8 +9,8 @@ public class GameManagerScript : MonoBehaviour {
     // GameManagerScript.instance();
     // see http://gameprogrammingpatterns.com/singleton.html for details
     private static GameManagerScript instance_;
-    private GameManagerScript(){};
-    public static GameManager instance()
+    private GameManagerScript(){}
+    public static GameManagerScript instance()
     {
       if (instance_ == null)
           instance_ = GameObject.FindObjectOfType<GameManagerScript>();
@@ -20,10 +20,11 @@ public class GameManagerScript : MonoBehaviour {
 
     private const int NUM_OF_CARDS = 40;
     private Queue<GameObject> deck;
-    private GameObject[] players;
+    private GameObject[] playerList;
     private int currentPlayerIndex;
     private int numOfDoubles;
     private int numOfPlayers;
+    private int lastPlayerIndex;
 
     private void Start()
     {
@@ -31,8 +32,8 @@ public class GameManagerScript : MonoBehaviour {
        GameObject[] deckArray = GameObject.FindGameObjectsWithTag("Card");
        deck = new Queue<GameObject>(Shuffle(deckArray));
 
-       players = GameObject.FindGameObjectsWithTag("Player");
-       numOfPlayers = players.Length();
+       playerList = GameObject.FindGameObjectsWithTag("Player");
+       numOfPlayers = playerList.Length;
        currentPlayerIndex = FirstPlayer();
     }
 
@@ -46,15 +47,16 @@ public class GameManagerScript : MonoBehaviour {
     // actually starts?
     public void StartGame()
     {
-      players[currentPlayerIndex].StartTurn();
+      playerList[currentPlayerIndex].GetComponent<PlayerScript>().StartTurn();
     }
 
-    // increments currentPlayerIndex, then starts next player's turn
+    // starts next player's turn
     public void NextTurn()
     {
+      lastPlayerIndex = currentPlayerIndex;
       currentPlayerIndex =  currentPlayerIndex++;
       numOfDoubles = 0;
-      players[currentPlayerIndex].StartTurn();
+      playerList[currentPlayerIndex].GetComponent<PlayerScript>().StartTurn();
     }
 
     // shuffles the original deck of cards
@@ -86,7 +88,7 @@ public class GameManagerScript : MonoBehaviour {
     public int FirstPlayer()
     {
         System.Random num = new System.Random();
-        return players[num.Next(numOfPlayers)];
+        return num.Next(numOfPlayers);
     }
 
     // Returns top card in deck
@@ -112,6 +114,14 @@ public class GameManagerScript : MonoBehaviour {
         numOfDoubles++;
     }
 
+    public GameObject[] GetPlayerList()
+    {
+        return playerList;
+    }
 
+    public int GetLastPlayerIndex()
+    {
+        return lastPlayerIndex;
+    }
 
 }

@@ -14,12 +14,12 @@ public class DieScript : MonoBehaviour
     {
         if(instance_ == null)
             instance_ = GameObject.FindObjectOfType<DieScript>();
-        return instance;
+        return instance_;
     }
     ////////////////////////////////
 
-    public GameManager gm;
-    public static const STANDARD_SIDES = 6;
+    public GameManagerScript gm;
+    public const int STANDARD_SIDES = 6;
     int prevDieRoll = 0;
     int die1;
     int die2;
@@ -30,7 +30,7 @@ public class DieScript : MonoBehaviour
     void Start()
     {
         // reference to the game manager
-        gm = GameManager.instance();
+        gm = GameManagerScript.instance();
     }
 
     //rolls two dice, upadtes previous die roll and possibly calls incDouble in gamemanager
@@ -42,7 +42,7 @@ public class DieScript : MonoBehaviour
 
         if (isDouble())
         {
-            gm.incDouble();
+            gm.IncDouble();
         }
 
         return prevDieRoll = die1 + die2;
@@ -57,7 +57,7 @@ public class DieScript : MonoBehaviour
 
         if (isDouble())
         {
-            gm.incDouble();
+            gm.IncDouble();
         }
 
         return prevDieRoll = die1 + die2;
@@ -77,7 +77,7 @@ public class DieScript : MonoBehaviour
     {
         if(die1 == die2)
         {
-            lastIsDouble = true;
+            lastDouble = true;
             return true;
         }
         return false;

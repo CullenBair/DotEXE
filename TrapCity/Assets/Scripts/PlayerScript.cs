@@ -12,18 +12,22 @@ public class PlayerScript : MonoBehaviour
     private bool myTurn;
     private GameManagerScript gm;
     private DieScript die;
+    private BoardScript board;
 
     // enum for possible states
     private enum State { Active, Rolling, Waiting };
+    State state;
 
     private void Start()
     {
         // setting initial state
-        State state = State.Waiting;
+        state = State.Waiting;
         // reference to die
         die = DieScript.instance();
+        //reference to board
+        board = BoardScript.instance();
         // reference to the game manager
-        gm = GameManager.instance();
+        gm = GameManagerScript.instance();
         //override this from game manager
         playerIndex = -1;
         timeInJail = 0;
@@ -51,7 +55,7 @@ public class PlayerScript : MonoBehaviour
     }
 
     // Ends player turn
-    private void EndTurn();
+    private void EndTurn()
     {
         state = State.Waiting;
         gm.NextTurn();
@@ -82,15 +86,18 @@ public class PlayerScript : MonoBehaviour
     // returns money from player requested
     public void PayMe()
     {
-        GameManager gm = GetComponent<GameManager>();
-        Board board = GetComponent<Board>();
+        // Note: will have to check for if the tile belongs to the interface
+        // IBuyTileScript, otherwise the tile will not have the GetRent function
+        // as it is a method of the interface, not TileScript.
+
+        /*
         // Looks for any money to be gained (penality if can't)
-        int propLocationIndex = gm.playerList[gm.lastRolledPlayerIndex].playerLocationIndex;
-        if (board.owner[propLocationIndex] == this.playerIndex)
+        int propLocationIndex = gm.GetPlayerList()[gm.GetLastPlayerIndex()].GetComponent<PlayerScript>().playerLocationIndex;
+        TileScript lastPlayerLocation = board.GetTile(propLocationIndex).GetComponent<TileScript>();
+        if (lastPlayerLocation.GetOwner().GetComponent<PlayerScript>().GetIndex() == this.playerIndex)
         {
             //gets money
-            Tile tile = board.locations[propLocationIndex];
-            cash += tile.rent[tile.rentIndex];
+            cash += lastPlayerLocation.GetRent();
             //make other player pay
         }
         else
@@ -98,8 +105,29 @@ public class PlayerScript : MonoBehaviour
             //placeholder for penalty for pressing pay me when you shouldn't
             cash -= 50;
         }
-
+        */
     }
 
+    public int GetIndex()
+    {
+        return playerIndex;
+    }
+
+    public int GetCash()
+    {
+        return this.cash;
+    }
+
+    // SET the cash to a value
+    public void SetCash(int cash)
+    {
+        this.cash = cash;
+    }
+
+    // ADD a value to the cash amount
+    public void AddCash(int cash)
+    {
+        this.cash += cash;
+    }
 
 }

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoToJailScript : MonoBehaviour, TileScript
+public class GoToJailScript : TileScript
 {
     private GameObject player;
 
     // sending player to jail
-    public override void Activate(GameObject player)
+    public override void Activate()
     {
         // dont know how to do yet
     }

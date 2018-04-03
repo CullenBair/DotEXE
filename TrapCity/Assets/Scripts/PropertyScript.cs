@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PropertyScript : MonoBehaviour, /*TileScript,*/ IBuyTile
+public class PropertyScript : TileScript, IBuyTile
 {
 	private int[] rent;
 	private int rentIndex;
@@ -18,6 +18,11 @@ public class PropertyScript : MonoBehaviour, /*TileScript,*/ IBuyTile
 		return true;
 	}
 
+	public override void Activate()
+	{
+		print("Activate not implemented");
+	}
+
 	//Set the owner.
 	public void SetOwner(PlayerScript player)
 	{
@@ -27,7 +32,7 @@ public class PropertyScript : MonoBehaviour, /*TileScript,*/ IBuyTile
 	//Pay the player.
 	public void PayPlayer(PlayerScript player)
 	{
-		player.SetCash(player.GetCash() + GetRent());
+		player.AddCash(GetRent());
 	}
 
 	//This property is now mortgaged.

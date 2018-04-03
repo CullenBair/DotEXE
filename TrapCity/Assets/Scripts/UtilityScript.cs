@@ -3,12 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UtilityScript : MonoBehaviour, /*TileScript,*/ IBuyTile
+public class UtilityScript : TileScript, IBuyTile
 {
 	private int[] rent;
 	private int rentIndex;
 	private int mortgagePrice;
 	private bool isMortgaged;
+
+	public override void Activate()
+	{
+		print("Activate not implemented");
+	}
 
 	//From IBuyTile:
 
@@ -51,7 +56,7 @@ public class UtilityScript : MonoBehaviour, /*TileScript,*/ IBuyTile
 	//Return the propety's current rent.
 	public int GetRent()
 	{
-		return GetPrevDieRoll();
+		return DieScript.instance().GetPrevDieRoll();
 	}
 
 	//Other methods:

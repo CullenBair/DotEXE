@@ -6,10 +6,10 @@ public abstract class CardScript : MonoBehaviour
 {
     public GameObject gm;
 
-    string name;
+    string cardName;
     bool useImmediately;
     string text;
 
     public abstract void Activate();
-  
+
 }

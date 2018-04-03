@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TaxScript : MonoBehaviour/*, TileScript,*/
+public class TaxScript : TileScript
 {
+
+	private PlayerScript player;
+
 	// Tax either 200 or 10%.
-	public override void Activate(PlayerScript player)
+	public override void Activate()
 	{
 		if(player.GetCash() >= 200)
 		{
