@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour {
 
+    // author: Joe Peaden
+
     // The following block is singleton pattern, basically
     // it should give an access point to it from all gameobjects by calling
     // GameManagerScript.instance();
