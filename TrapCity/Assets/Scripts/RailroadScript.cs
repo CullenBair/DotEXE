@@ -47,8 +47,12 @@ public class RailRoadScript : MonoBehaviour, TileScript, IBuyTile
 	{
 		return rent[rentIndex];
 	}
-		
-	//Other methods:
+
+	//Return the property's rent index.
+	public int GetRentIndex()
+	{
+		return rentIndex;
+	}
 
 	//Upgrade the property by updating its price and house/hotel sprites.
 	public void Upgrade()

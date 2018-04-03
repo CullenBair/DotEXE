@@ -11,4 +11,6 @@ public interface IBuyTile
 	void FromMortgaged();
 	bool GetIsMortgaged();
 	int GetRent();
+	int GetRentIndex();
+	void Upgrade();
 }
