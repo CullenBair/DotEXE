@@ -10,23 +10,17 @@ public class RailRoadScript : TileScript, IBuyTile
 	private int mortgagePrice;
 	private bool isMortgaged;
 
+	public override void Activate()
+-	{
+-		print("Activate not implemented");
+-	}
+
 	//From IBuyTile:
 
 	//Is it owned?
 	public bool IsOwned()
 	{
 		return true;
-	}
-
-	public override void Activate()
-	{
-		print("Activate not implemented");
-	}
-
-	//Set the owner.
-	public void SetOwner(PlayerScript player)
-	{
-		//
 	}
 
 	//Pay the player.
@@ -59,12 +53,16 @@ public class RailRoadScript : TileScript, IBuyTile
 		return rent[rentIndex];
 	}
 
-	//Other methods:
+	//Return the property's rent index.
+	public int GetRentIndex()
+	{
+		return rentIndex;
+	}
 
 	//Upgrade the property by updating its price and house/hotel sprites.
 	public void Upgrade()
 	{
-		if(rentIndex != rent.Length)
+		if(rentIndex != rent.Length - 1)
 		{
 			rentIndex++;
 		}
