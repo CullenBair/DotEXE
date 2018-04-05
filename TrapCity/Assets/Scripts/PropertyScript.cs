@@ -10,6 +10,12 @@ public class PropertyScript : TileScript, IBuyTile
 	private int mortgagePrice;
 	private bool isMortgaged;
 
+
+	void Activate()
+	{
+		print("Activate not yet implemented");
+	}
+
 	//From IBuyTile:
 
 	//Is it owned?
