@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class CardScript : MonoBehaviour
+// No longer needs to be abstract, all decks will be of type card. 
+public class CardScript : MonoBehaviour
 {
     public GameObject gm;
-
+    public bool useImmediately;
+    public string text;
     string cardName;
-    bool useImmediately;
-    string text;
 
-    public abstract void Activate();
+    public void Activate()
+    {
 
+    }
 }

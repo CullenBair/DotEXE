@@ -10,18 +10,23 @@ public class PropertyScript : TileScript, IBuyTile
 	private int mortgagePrice;
 	private bool isMortgaged;
 
-
-	void Activate()
-	{
-		print("Activate not yet implemented");
-	}
-
 	//From IBuyTile:
 
 	//Is it owned?
 	public bool IsOwned()
 	{
 		return true;
+	}
+
+	public override void Activate()
+	{
+		print("Activate not implemented");
+	}
+
+	//Set the owner.
+	public void SetOwner(PlayerScript player)
+	{
+		//
 	}
 
 	//Pay the player.
@@ -54,16 +59,12 @@ public class PropertyScript : TileScript, IBuyTile
 		return rent[rentIndex];
 	}
 
-	//Return the property's rent index.
-	public int GetRentIndex()
-	{
-		return rentIndex;
-	}
+	//Other methods:
 
 	//Upgrade the property by updating its price and house/hotel sprites.
 	public void Upgrade()
 	{
-		if(rentIndex != rent.Length - 1)
+		if(rentIndex != rent.Length)
 		{
 			rentIndex++;
 		}

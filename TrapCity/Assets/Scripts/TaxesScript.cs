@@ -3,17 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TaxScript : TileScript
+public class TaxesScript : TileScript
 {
-
 	private PlayerScript player;
 
 	// Tax either 200 or 10%.
 	public override void Activate()
 	{
-		if(player.GetCash() >= 200)
+        // Attach player who activated tile
+        player = null;
+
+		if (player.GetCash() >= 200)
 		{
-			// Player chooses how they're taxed.
+            // Player chooses how to pay?
+            TaxTwoHundred(player);
 		}
 		else
 		{
