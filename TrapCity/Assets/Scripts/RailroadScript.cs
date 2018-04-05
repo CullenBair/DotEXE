@@ -3,12 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RailRoadScript : MonoBehaviour, TileScript, IBuyTile
+public class RailRoadScript : TileScript, IBuyTile
 {
 	private int[] rent;
 	private int rentIndex;
 	private int mortgagePrice;
 	private bool isMortgaged;
+
+	public override void Activate()
+-	{
+-		print("Activate not implemented");
+-	}
 
 	//From IBuyTile:
 
