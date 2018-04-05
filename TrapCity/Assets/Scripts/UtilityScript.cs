@@ -20,7 +20,7 @@ public class UtilityScript : TileScript, IBuyTile
 	public void Start()
 	{
 		//Gets reference to the die object.
-		die = GameObject.FindGameObjectWithTag("Die").GetComponent<DieScript>();
+		die = DieScript.instance().GetComponent<DieScript>();
 	}
 
 	//From IBuyTile:
