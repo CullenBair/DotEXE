@@ -27,7 +27,7 @@ public class PropertyScript : TileScript, IBuyTile
 	//Pay the player.
 	public void PayPlayer(PlayerScript player)
 	{
-		player.SetCash(player.GetCash() + GetRent());
+		player.AddCash(GetRent());
 	}
 
 	//This property is now mortgaged.
