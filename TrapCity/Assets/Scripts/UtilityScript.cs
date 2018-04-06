@@ -5,22 +5,14 @@ using UnityEngine;
 
 public class UtilityScript : TileScript, IBuyTile
 {
-	private int[] rent = {4,10};
+	private int[] rent;
 	private int rentIndex;
 	private int mortgagePrice;
 	private bool isMortgaged;
-	private DieScript die;
 
 	public override void Activate()
 	{
-		print("Activate not yet implemented");
-	}
-
-	//Assign the die object to "die" for referencing.
-	public void Start()
-	{
-		//Gets reference to the die object.
-		die = DieScript.instance().GetComponent<DieScript>();
+		print("Activate not implemented");
 	}
 
 	//From IBuyTile:
@@ -28,7 +20,13 @@ public class UtilityScript : TileScript, IBuyTile
 	//Is it owned?
 	public bool IsOwned()
 	{
-		return GetOwner() != null;
+		return true;
+	}
+
+	//Set the owner.
+	public void SetOwner(PlayerScript player)
+	{
+		//
 	}
 
 	//Pay the player.
@@ -55,22 +53,18 @@ public class UtilityScript : TileScript, IBuyTile
 		return isMortgaged;
 	}
 
-	//Return the rent amount based on the previous die roll and the rent index multiplier.
+	//Return the propety's current rent.
 	public int GetRent()
 	{
-		return die.GetPrevDieRoll() * rent[rentIndex];
+		return DieScript.instance().GetPrevDieRoll();
 	}
 
-	//Return the property's rent index.
-	public int GetRentIndex()
-	{
-		return rentIndex;
-	}
+	//Other methods:
 
 	//Upgrade the property by updating its price and house/hotel sprites.
 	public void Upgrade()
 	{
-		if(rentIndex != rent.Length - 1)
+		if(rentIndex != rent.Length)
 		{
 			rentIndex++;
 		}

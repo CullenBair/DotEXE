@@ -4,11 +4,10 @@ using UnityEngine;
 
 // Joseph Peaden
 
-public abstract class TileScript : MonoBehaviour
-{
+public abstract class TileScript : MonoBehaviour {
 
     private string tileName;
-    // contains linked 
+    // contains linked
     private List<GameObject> linkedTiles;
     private GameObject owner;
     private int buyCost;
@@ -45,13 +44,7 @@ public abstract class TileScript : MonoBehaviour
     public GameObject GetOwner()
     {
         return owner;
-	}
-
-	// set owner
-	public void SetOwner(PlayerScript player)
-	{
-		this.owner = player;
-	}
+    }
 
     // get the buy cost of the tile. If not buyable, should be set to zero.
     public int GetBuyCost()
