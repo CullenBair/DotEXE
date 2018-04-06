@@ -33,7 +33,8 @@ public class GameManagerScript : MonoBehaviour {
        // gets all "Card" objects in scene as an array, shuffle, and convert to queue
        GameObject[] deckArray = GameObject.FindGameObjectsWithTag("Card");
        deck = new Queue<GameObject>(Shuffle(deckArray));
-
+    
+       // ===============> Get number of player from title screen and assign to numOfPlayers, let spawner create?      <============= Jared 4/4/18
        playerList = GameObject.FindGameObjectsWithTag("Player");
        numOfPlayers = playerList.Length;
        currentPlayerIndex = FirstPlayer();
@@ -124,6 +125,11 @@ public class GameManagerScript : MonoBehaviour {
     public int GetLastPlayerIndex()
     {
         return lastPlayerIndex;
+    }
+
+    public int GetNumPlayers()
+    {
+        return numOfPlayers;
     }
 
 }
