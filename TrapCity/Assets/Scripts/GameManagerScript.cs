@@ -127,4 +127,9 @@ public class GameManagerScript : MonoBehaviour {
         return lastPlayerIndex;
     }
 
+    public int GetNumPlayers()
+    {
+        return numOfPlayers;
+    }
+
 }
