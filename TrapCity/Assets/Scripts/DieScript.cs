@@ -9,10 +9,10 @@ public class DieScript : MonoBehaviour
     // DieScript.instance();
     // see http://gameprogrammingpatterns.com/singleton.html for details
     private static DieScript instance_;
-    private DieScript() {}
+    private DieScript() { }
     public static DieScript instance()
     {
-        if(instance_ == null)
+        if (instance_ == null)
             instance_ = GameObject.FindObjectOfType<DieScript>();
         return instance_;
     }
@@ -37,8 +37,8 @@ public class DieScript : MonoBehaviour
     public int RollDie(int numSides)
     {
         lastDouble = false;
-        die1 = Random.Range(1, numSides+1);
-        die2 = Random.Range(1, numSides+1);
+        die1 = Random.Range(1, numSides + 1);
+        die2 = Random.Range(1, numSides + 1);
 
         if (isDouble())
         {
@@ -52,11 +52,13 @@ public class DieScript : MonoBehaviour
     public int RollDie()
     {
         lastDouble = false;
-        die1 = Random.Range(1, STANDARD_SIDES+1);
-        die2 = Random.Range(1, STANDARD_SIDES+1);
+        die1 = Random.Range(1, STANDARD_SIDES + 1);
+        die2 = Random.Range(1, STANDARD_SIDES + 1);
+        Debug.Log("Dice 1: " + die1 + ", Dice 2: " + die2);
 
         if (isDouble())
         {
+            Debug.Log("DOUBLE, roll again!");
             gm.IncDouble();
         }
 
@@ -75,7 +77,7 @@ public class DieScript : MonoBehaviour
 
     public bool isDouble()
     {
-        if(die1 == die2)
+        if (die1 == die2)
         {
             lastDouble = true;
             return true;

@@ -28,10 +28,12 @@ public class PlayerScript : MonoBehaviour
         board = BoardScript.instance();
         // reference to the game manager
         gm = GameManagerScript.instance();
-        //override this from game manager
-        playerIndex = -1;
+
+        // inital assigns
         timeInJail = 0;
         playerLocationIndex = 0;
+        cash = 1500;
+        numProperties = 0;
     }
 
     // Rolls die, if double then state == active,
@@ -39,25 +41,54 @@ public class PlayerScript : MonoBehaviour
     // to gamemanger
     public void Roll()
     {
-        int roll = die.RollDie();
-        if(die.wasLastDouble())
-            // NOTE: THIS SHOULD BE SET TO ACTIVE. HAVE NOT FIGURED OUT HOW TO DEAL WITH
-            // THE DOUBLE ROLL STATE. FOR NOW WILL JUST IMMEDIATELY ROLL
-            state = State.Rolling;
-        else
-            state = State.Active;
+        state = State.Rolling;
+        int roll;
+
+        // Roll and move
+        while (state == State.Rolling)
+        {
+            roll = die.RollDie();
+            if (!die.wasLastDouble())
+                state = State.Active;
+
+            // Update player
+            MovePlayer(roll);
+        }
+
+        EndTurn();
+    }
+
+    private void MovePlayer(int dist)
+    {
+        // finds how many tiles on board
+        int len = gm.GetComponent<GameManagerScript>().tilesList.Length;
+
+        // Move player tile by tile
+        for (int i = 1; i <= dist; i++)
+        {
+            // Play position = next tile position
+            transform.position = gm.GetComponent<GameManagerScript>().tilesList[(playerLocationIndex + i) % len].transform.position;
+
+            // Add delay
+        }
+
+        playerLocationIndex = (playerLocationIndex + dist) % len;
     }
 
     // Starts player turn
     public void StartTurn()
     {
         state = State.Active;
+        //button.SetActive(true);
+        myTurn = true;
     }
 
     // Ends player turn
     private void EndTurn()
     {
         state = State.Waiting;
+        //button.SetActive(false);
+        myTurn = false;
         gm.NextTurn();
     }
 
@@ -130,4 +161,8 @@ public class PlayerScript : MonoBehaviour
         this.cash += cash;
     }
 
+    public void SetPlayerIndex(int index)
+    {
+        this.playerIndex = index;
+    }
 }
