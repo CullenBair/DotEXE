@@ -1,18 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
     private int playerIndex;
-    private int cash;
-    private int numProperties;
+    public int cash;
+    public int numProperties;
     private int timeInJail;
     private int playerLocationIndex;
     private bool myTurn;
+    public string playerName;
     private GameManagerScript gm;
     private DieScript die;
     private BoardScript board;
+    public Text playerInfoText;
+    public int playerIndexText;
+    public List<GameObject> ownedTiles;
 
     // enum for possible states
     private enum State { Active, Rolling, Waiting };
@@ -32,6 +37,7 @@ public class PlayerScript : MonoBehaviour
         // inital assigns
         timeInJail = 0;
         playerLocationIndex = 0;
+        playerInfoText.text = "init";
         cash = 1500;
         numProperties = 0;
     }
@@ -161,6 +167,26 @@ public class PlayerScript : MonoBehaviour
         this.cash += cash;
     }
 
+    void Update()
+    {
+        //UpdateText();
+    }
+
+    public void UpdateText()
+    {
+        playerInfoText.text = playerName + " cash: $" + cash;
+        playerInfoText.text += "\n";
+        playerInfoText.text += "properties: " + numProperties;
+        if (ownedTiles.Count != 0)
+        {
+            playerInfoText.text += "\nOwned Properties:\n";
+            foreach(GameObject tile in ownedTiles)
+            {
+                playerInfoText.text += " " + tile.name + "\n";
+            }
+        }
+    }
+    
     public void SetPlayerIndex(int index)
     {
         this.playerIndex = index;
