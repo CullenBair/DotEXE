@@ -7,7 +7,7 @@ using UnityEngine;
 public abstract class TileScript : MonoBehaviour {
 
     private string tileName;
-    // contains linked 
+    // contains linked
     private List<GameObject> linkedTiles;
     private GameObject owner;
     private int buyCost;
