@@ -5,24 +5,35 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-    private int playerIndex;
+    // Player info
     public int cash;
-    public int numProperties;
-    private int timeInJail;
-    private int playerLocationIndex;
-    private bool myTurn;
     public string playerName;
-    private GameManagerScript gm;
-    private DieScript die;
-    private BoardScript board;
+    public int numProperties;
     public Text playerInfoText;
     public int playerIndexText;
     public List<GameObject> ownedTiles;
 
-    // enum for possible states
+    private int timeInJail;
+    private int playerIndex;
+    private int playerLocationIndex;
+
+    // State 
+    private bool myTurn;
     private enum State { Active, Rolling, Waiting };
     State state;
 
+    // Movement
+    public float moveTime;
+    private bool stillMoving;
+
+    // References
+    private GameManagerScript gm;
+    private DieScript die;
+    private BoardScript board;
+
+
+
+    // Init
     private void Start()
     {
         // setting initial state
@@ -37,9 +48,10 @@ public class PlayerScript : MonoBehaviour
         // inital assigns
         timeInJail = 0;
         playerLocationIndex = 0;
-        playerInfoText.text = "init";
+        //playerInfoText.text = "init";
         cash = 1500;
         numProperties = 0;
+        stillMoving = false;
     }
 
     // Rolls die, if double then state == active,
@@ -64,21 +76,55 @@ public class PlayerScript : MonoBehaviour
         EndTurn();
     }
 
-    private void MovePlayer(int dist)
+    // Moves player to target destination
+    private void MovePlayer(int rolled)
     {
         // finds how many tiles on board
         int len = gm.GetComponent<GameManagerScript>().tilesList.Length;
 
-        // Move player tile by tile
-        for (int i = 1; i <= dist; i++)
-        {
-            // Play position = next tile position
-            transform.position = gm.GetComponent<GameManagerScript>().tilesList[(playerLocationIndex + i) % len].transform.position;
+        // Move tile by tile
+        StartCoroutine(SmoothMovement(rolled, len));
+    }
 
-            // Add delay
+    // Moves player to each tile smoothly
+    private IEnumerator SmoothMovement(int distToMove, int numTiles)
+    {
+        // Wait until previous roll is finished before moving (multiple instances)
+        while (stillMoving)
+            yield return new WaitForSeconds(0.1f);
+   
+        stillMoving = true;
+
+        // Move player tile by tile
+        for (int i = 1; i <= distToMove; i++)
+        {
+            // Find target position
+            Vector3 targetPos = gm.GetComponent<GameManagerScript>().tilesList[(playerLocationIndex + i) % numTiles].transform.position;
+
+            StartCoroutine(MoveOverSeconds(targetPos, moveTime));
+            yield return new WaitForSeconds(moveTime + 0.1f);
         }
 
-        playerLocationIndex = (playerLocationIndex + dist) % len;
+        // Update player's location after move
+        playerLocationIndex = (playerLocationIndex + distToMove) % numTiles;
+        stillMoving = false;
+    }
+
+    // Moves a player uniformly from one location to another
+    private IEnumerator MoveOverSeconds(Vector3 end, float  desiredTime)
+    {
+        float elapsedTime = 0;
+        Vector3 startPos = transform.position;
+
+        // Move player by time
+        while (elapsedTime < desiredTime)
+        {
+            transform.position = Vector3.Lerp(startPos, end, (elapsedTime / desiredTime));
+            elapsedTime += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.position = end;
     }
 
     // Starts player turn
