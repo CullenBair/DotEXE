@@ -18,14 +18,11 @@ public class DieScript : MonoBehaviour
     }
     ////////////////////////////////
 
-    public GameManagerScript gm;
-    public const int STANDARD_SIDES = 6;
-    int prevDieRoll = 0;
-    int die1;
-    int die2;
-    // player needs to know as well, so this is set to
-    // true if this particular roll was a double
-    bool lastDouble = false;
+    private GameManagerScript gm;
+    private const int STANDARD_SIDES = 6;
+    private int die1 = 0;
+    private int die2 = 0;
+
 
     void Start()
     {
@@ -33,55 +30,33 @@ public class DieScript : MonoBehaviour
         gm = GameManagerScript.instance();
     }
 
-    //rolls two dice, upadtes previous die roll and possibly calls incDouble in gamemanager
+    // method overload to handle standart sided die rolls
+    public int RollDie()
+    {
+        return RollDie(STANDARD_SIDES);
+    }
+
+    // Rolls two dice, upadtes previous die roll and possibly calls incDouble in gamemanager
     public int RollDie(int numSides)
     {
-        lastDouble = false;
         die1 = Random.Range(1, numSides + 1);
         die2 = Random.Range(1, numSides + 1);
 
         if (isDouble())
-        {
             gm.IncDouble();
-        }
 
-        return prevDieRoll = die1 + die2;
+        return die1 + die2;
     }
 
-    // method overload to handle standart sided die rolls
-    public int RollDie()
-    {
-        lastDouble = false;
-        die1 = Random.Range(1, STANDARD_SIDES + 1);
-        die2 = Random.Range(1, STANDARD_SIDES + 1);
-        Debug.Log("Dice 1: " + die1 + ", Dice 2: " + die2);
-
-        if (isDouble())
-        {
-            Debug.Log("DOUBLE, roll again!");
-            gm.IncDouble();
-        }
-
-        return prevDieRoll = die1 + die2;
-    }
-
-    public bool wasLastDouble()
-    {
-        return lastDouble;
-    }
-
-    public int GetPrevDieRoll()
-    {
-        return prevDieRoll;
-    }
-
+    // Checks if double and sets bool
     public bool isDouble()
     {
-        if (die1 == die2)
-        {
-            lastDouble = true;
-            return true;
-        }
-        return false;
+        return die1 == die2;
     }
+
+    // Returns combined value of dices rolls
+    public int GetPrevDieRoll()
+    {
+        return die1 + die2;
+    }    
 }

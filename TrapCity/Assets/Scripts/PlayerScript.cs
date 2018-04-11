@@ -14,12 +14,12 @@ public class PlayerScript : MonoBehaviour
     public List<GameObject> ownedTiles;
 
     private int timeInJail;
-    private int playerIndex;
-    private int playerLocationIndex;
+    private int playerIndex;    // In gm's player array
+    private int locationIndex;  // On gm's tile array
+    private int oldIndex;       // used when moving player
 
     // State 
-    private bool myTurn;
-    private enum State { Active, Rolling, Waiting };
+    private enum State { Active, Rolling, Rolled, Waiting };
     State state;
 
     // Movement
@@ -32,12 +32,11 @@ public class PlayerScript : MonoBehaviour
     private BoardScript board;
 
 
-
     // Init
-    private void Start()
+    void Start()
     {
         // setting initial state
-        state = State.Waiting;
+        SetWaiting();
         // reference to die
         die = DieScript.instance();
         //reference to board
@@ -47,33 +46,58 @@ public class PlayerScript : MonoBehaviour
 
         // inital assigns
         timeInJail = 0;
-        playerLocationIndex = 0;
+        locationIndex = 0;
         //playerInfoText.text = "init";
         cash = 1500;
         numProperties = 0;
         stillMoving = false;
     }
 
-    // Rolls die, if double then state == active,
-    // else state == waiting and return control
-    // to gamemanger
+
+    /*             PLAYER STATES                */
+
+
+    // Waiting state
+    private void SetWaiting()
+    {
+        state = State.Waiting;
+        // payMeButton.SetActive(true);
+    }
+
+    // Active state
+    public void StartTurn()
+    {
+        state = State.Active;
+        // rollButton.SetActive(true);
+        // Enable trading
+    }
+
+    // Rolling state
     public void Roll()
     {
+        // Only roll when its the players turn
+        if (state != State.Active)
+            return;
+
+        // Disable trading
+        // payMeButton.SetActive(false);
+
         state = State.Rolling;
-        int roll;
+        int roll = die.RollDie();
 
-        // Roll and move
-        while (state == State.Rolling)
-        {
-            roll = die.RollDie();
-            if (!die.wasLastDouble())
-                state = State.Active;
+        // Check for triple doubles
+        if (gm.GetNumDoubles() >= 3)
+            ; // Move to jail and end turn 
 
-            // Update player
-            MovePlayer(roll);
-        }
+        // Update location to trigger Update()
+        locationIndex = (locationIndex + roll) % gm.GetNumTiles();
+    }
 
-        EndTurn();
+    // Moving State
+    void Update()
+    {
+        if (state == State.Rolled && stillMoving == false)
+            EndTurn();
     }
 
     // Moves player to target destination
@@ -98,15 +122,21 @@ public class PlayerScript : MonoBehaviour
         // Move player tile by tile
         for (int i = 1; i <= distToMove; i++)
         {
+            Vector3 targetPos;
+            GameObject targetTile = gm.GetComponent<GameManagerScript>().tilesList[(locationIndex + i) % numTiles];
+            
             // Find target position
-            Vector3 targetPos = gm.GetComponent<GameManagerScript>().tilesList[(playerLocationIndex + i) % numTiles].transform.position;
+            if (targetTile.transform.childCount > 0)
+                targetPos = targetTile.transform.GetChild(1).position;
+            else
+                targetPos = targetTile.transform.position;
 
             StartCoroutine(MoveOverSeconds(targetPos, moveTime));
             yield return new WaitForSeconds(moveTime + 0.1f);
         }
 
         // Update player's location after move
-        playerLocationIndex = (playerLocationIndex + distToMove) % numTiles;
+        locationIndex = (locationIndex + distToMove) % numTiles;
         stillMoving = false;
     }
 
@@ -127,20 +157,11 @@ public class PlayerScript : MonoBehaviour
         transform.position = end;
     }
 
-    // Starts player turn
-    public void StartTurn()
-    {
-        state = State.Active;
-        //button.SetActive(true);
-        myTurn = true;
-    }
-
     // Ends player turn
     private void EndTurn()
     {
         state = State.Waiting;
-        //button.SetActive(false);
-        myTurn = false;
+        //button.SetActive(false); // Client side
         gm.NextTurn();
     }
 
@@ -213,11 +234,7 @@ public class PlayerScript : MonoBehaviour
         this.cash += cash;
     }
 
-    void Update()
-    {
-        //UpdateText();
-    }
-
+    
     public void UpdateText()
     {
         playerInfoText.text = playerName + " cash: $" + cash;

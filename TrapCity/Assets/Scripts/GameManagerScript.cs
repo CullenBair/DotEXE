@@ -131,6 +131,11 @@ public class GameManagerScript : MonoBehaviour
         numOfDoubles++;
     }
 
+    public int GetNumDoubles()
+    {
+        return numOfDoubles;
+    }
+
     public GameObject[] GetPlayerList()
     {
         return playerList;
@@ -146,4 +151,8 @@ public class GameManagerScript : MonoBehaviour
         return numOfPlayers;
     }
 
+    public int GetNumTiles()
+    {
+        return tilesList.Length;
+    }
 }
