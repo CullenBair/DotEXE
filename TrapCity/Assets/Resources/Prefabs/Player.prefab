@@ -53,11 +53,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cash: 0
-  numProperties: 0
   playerName: 
+  numProperties: 0
   playerInfoText: {fileID: 0}
   playerIndexText: 0
   ownedTiles: []
+  moveTime: 0.25
 --- !u!212 &212559853803263504
 SpriteRenderer:
   m_ObjectHideFlags: 1
