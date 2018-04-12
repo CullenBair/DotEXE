@@ -42,6 +42,29 @@ socket.On("hi", (data) =>
 });
 ```
 
+Project specific examples
+```cs
+using Quobject.SocketIoClientDotNet.Client;
+using Newtonsoft.Json.JsonConvert;
+
+var socket = IO.Socket("http://localhost:3000"); // we will be updating the URL later, I'm still setting up the server
+
+// generic update example
+// player updated some information, money, position, etc
+string userData = JsonConvert.SerializeObject(playerList[playerIndex]); // converts
+socket.Emit("user update", userData);
+
+// received event by all other game clients
+socket.On("user update", (userData) =>
+{
+    Player player = Players[userData.id];
+    player.money = userdata.money;
+    player.position = player.position;
+    // etc
+});
+
+```
+
 And, with Newtonsoft.Json.dll, we can easliy serialize / deserialize json object. Read more about [Newtonsoft.Json](http://www.newtonsoft.com/json).
 
 ## Features
