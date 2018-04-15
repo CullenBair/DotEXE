@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GOScript : MonoBehaviour/*, TileScript,*/
+public class GOScript : TileScript
 {
-	int goValue = 200;
+	public static int goValue = 200;
+
+	public override void Activate(){}
 }

@@ -19,12 +19,15 @@ public class PlayerScript : MonoBehaviour
     private int oldIndex;       // used when moving player
 
     // State 
-    private enum State { Active, Rolling, Rolled, Waiting };
+    private enum State { Waiting, Active, Moving, Animation, Finished };
     State state;
 
     // Movement
-    public float moveTime;
-    private bool stillMoving;
+    private int lastRolled;
+    private float moveTime;
+    private float elapsedTime;
+    private Vector3 startPos;
+    private Vector3 targetPos;
 
     // References
     private GameManagerScript gm;
@@ -36,7 +39,7 @@ public class PlayerScript : MonoBehaviour
     void Start()
     {
         // setting initial state
-        SetWaiting();
+        state = State.Active;
         // reference to die
         die = DieScript.instance();
         //reference to board
@@ -45,12 +48,10 @@ public class PlayerScript : MonoBehaviour
         gm = GameManagerScript.instance();
 
         // inital assigns
-        timeInJail = 0;
-        locationIndex = 0;
         //playerInfoText.text = "init";
         cash = 1500;
-        numProperties = 0;
-        stillMoving = false;
+        moveTime = 0.25f;
+        elapsedTime = int.MaxValue;
     }
 
 
@@ -82,85 +83,88 @@ public class PlayerScript : MonoBehaviour
         // Disable trading
         // payMeButton.SetActive(false);
 
-        state = State.Rolling;
-        int roll = die.RollDie();
+        lastRolled = die.RollDie();
 
-        // Check for triple doubles
+		/////////////////////////////////////////////////////////////////////////////////
+
+        // Check for triple doubles incase player needs to go to jail
         if (gm.GetNumDoubles() >= 3)
-            ; // Move to jail and end turn 
+		{
+			locationIndex = gm.GetComponent<GameManagerScript>().tilesList[10];
+			state = State.Finished;
+		}
+
+		/////////////////////////////////////////////////////////////////////////////////
 
         // Update location to trigger Update()
-        locationIndex = (locationIndex + roll) % gm.GetNumTiles();
+		locationIndex += lastRolled;
+
+		//Pass GO, collect 200 dollars.
+		if (locationIndex >= gm.GetNumTiles())
+		{
+			this.cash += GOScript.goValue;
+			locationIndex -= gm.GetNumTiles();
+		}
+
+		state = State.Moving;
     }
 
     // Moving State
     void Update()
     {
-        if (state == State.Rolled && stillMoving == false)
+        if (state == State.Moving)
+        {
+            // finds how many tiles on board
+            int len = gm.GetComponent<GameManagerScript>().tilesList.Length;
+
+            // Checks if finished moving
+            if (lastRolled <= 0)
+            {
+                // If double, roll again
+                if (die.isDouble())
+                    state = State.Active;
+                else
+                    state = State.Finished;
+
+                return;
+            }
+            else
+                lastRolled--;
+
+            // Find position of next tile (centered)
+            startPos = transform.position;
+            GameObject nextTile = gm.GetComponent<GameManagerScript>().tilesList[mod((locationIndex - lastRolled), len)];
+            if (nextTile.transform.childCount > 0)
+                targetPos = nextTile.transform.GetChild(1).position;
+            else
+                targetPos = nextTile.transform.position;
+
+            // Reset time to move
+            elapsedTime = 0;
+            state = State.Animation;
+        }
+
+        if (state == State.Finished)
             EndTurn();
     }
 
-    // Moves player to target destination
-    private void MovePlayer(int rolled)
+    // Handle animations
+    private void LateUpdate()
     {
-        // finds how many tiles on board
-        int len = gm.GetComponent<GameManagerScript>().tilesList.Length;
-
-        // Move tile by tile
-        StartCoroutine(SmoothMovement(rolled, len));
-    }
-
-    // Moves player to each tile smoothly
-    private IEnumerator SmoothMovement(int distToMove, int numTiles)
-    {
-        // Wait until previous roll is finished before moving (multiple instances)
-        while (stillMoving)
-            yield return new WaitForSeconds(0.1f);
-   
-        stillMoving = true;
-
-        // Move player tile by tile
-        for (int i = 1; i <= distToMove; i++)
-        {
-            Vector3 targetPos;
-            GameObject targetTile = gm.GetComponent<GameManagerScript>().tilesList[(locationIndex + i) % numTiles];
-            
-            // Find target position
-            if (targetTile.transform.childCount > 0)
-                targetPos = targetTile.transform.GetChild(1).position;
-            else
-                targetPos = targetTile.transform.position;
-
-            StartCoroutine(MoveOverSeconds(targetPos, moveTime));
-            yield return new WaitForSeconds(moveTime + 0.1f);
-        }
-
-        // Update player's location after move
-        locationIndex = (locationIndex + distToMove) % numTiles;
-        stillMoving = false;
-    }
-
-    // Moves a player uniformly from one location to another
-    private IEnumerator MoveOverSeconds(Vector3 end, float  desiredTime)
-    {
-        float elapsedTime = 0;
-        Vector3 startPos = transform.position;
-
         // Move player by time
-        while (elapsedTime < desiredTime)
+        if (elapsedTime < moveTime)
         {
-            transform.position = Vector3.Lerp(startPos, end, (elapsedTime / desiredTime));
+            transform.position = Vector3.Lerp(startPos, targetPos, (elapsedTime / moveTime));
             elapsedTime += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
         }
-
-        transform.position = end;
+        else if (state == State.Animation)
+            state = State.Moving;
     }
 
     // Ends player turn
     private void EndTurn()
     {
-        state = State.Waiting;
+        SetWaiting();
         //button.SetActive(false); // Client side
         gm.NextTurn();
     }
@@ -253,5 +257,11 @@ public class PlayerScript : MonoBehaviour
     public void SetPlayerIndex(int index)
     {
         this.playerIndex = index;
+    }
+
+
+    private int mod(int a, int b)
+    {
+        return (a % b + b) % b;
     }
 }

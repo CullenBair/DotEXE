@@ -67,7 +67,10 @@ public class GameManagerScript : MonoBehaviour
     {
         lastPlayerIndex = currentPlayerIndex;
         currentPlayerIndex = (currentPlayerIndex + 1) % playerList.Length;
-        numOfDoubles = 0;
+		/////////////////////////////////////////////////////////////////////////////////
+		//numOfDoubles = 0;
+        numOfDoubles = 2;
+		/////////////////////////////////////////////////////////////////////////////////
         playerList[currentPlayerIndex].GetComponent<PlayerScript>().StartTurn();
     }
 
