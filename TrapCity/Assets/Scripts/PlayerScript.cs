@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿// Jared and Tyler
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
@@ -7,24 +8,25 @@ public class PlayerScript : MonoBehaviour
 {
     // Player info
     public int cash;
-    public string playerName;
     public int numProperties;
-    public Text playerInfoText;
-    public int playerIndexText;
     public List<GameObject> ownedTiles;
 
+    private string playerName;
     private int timeInJail;
     private int playerIndex;    // In gm's player array
     private int locationIndex;  // On gm's tile array
     private int oldIndex;       // used when moving player
 
     // State 
-    private enum State { Active, Rolling, Rolled, Waiting };
+    private enum State { Waiting, Active, Moving, Animation, OnTile, Finished };
     State state;
 
     // Movement
-    public float moveTime;
-    private bool stillMoving;
+    private int lastRolled;
+    private float moveTime;
+    private float elapsedTime;
+    private Vector3 startPos;
+    private Vector3 targetPos;
 
     // References
     private GameManagerScript gm;
@@ -35,22 +37,20 @@ public class PlayerScript : MonoBehaviour
     // Init
     void Start()
     {
-        // setting initial state
-        SetWaiting();
+        // setting initial state (must be Active)
+        state = State.Active;
         // reference to die
         die = DieScript.instance();
-        //reference to board
+        // reference to board
         board = BoardScript.instance();
         // reference to the game manager
         gm = GameManagerScript.instance();
 
         // inital assigns
-        timeInJail = 0;
-        locationIndex = 0;
-        //playerInfoText.text = "init";
+        // playerInfoText.text = "init";
         cash = 1500;
-        numProperties = 0;
-        stillMoving = false;
+        moveTime = 0.25f;
+        elapsedTime = int.MaxValue;
     }
 
 
@@ -82,88 +82,106 @@ public class PlayerScript : MonoBehaviour
         // Disable trading
         // payMeButton.SetActive(false);
 
-        state = State.Rolling;
-        int roll = die.RollDie();
+        lastRolled = die.RollDie();
 
-        // Check for triple doubles
+        // Check for triple doubles, go to jail
         if (gm.GetNumDoubles() >= 3)
-            ; // Move to jail and end turn 
+        {
+            locationIndex = 10;
+            transform.position = gm.GetTile(10).transform.position;
+            state = State.Finished;
+            return;
+        }
 
         // Update location to trigger Update()
-        locationIndex = (locationIndex + roll) % gm.GetNumTiles();
+        locationIndex += lastRolled;
+
+        //Pass GO, collect 200 dollars.
+        if (locationIndex >= gm.GetNumTiles())
+        {
+            this.cash += gm.GetTile(0).GetComponent<GOScript>().GetGoValue();
+            locationIndex -= gm.GetNumTiles();
+        }
+
+        state = State.Moving;
     }
 
     // Moving State
     void Update()
     {
-        if (state == State.Rolled && stillMoving == false)
+        if (state == State.Moving)
+        {
+            // finds how many tiles on board
+            int len = gm.GetComponent<GameManagerScript>().tilesList.Length;
+
+            // Checks if finished moving
+            if (lastRolled <= 0)
+            {
+                state = State.OnTile;
+                return;
+            }
+            else
+                lastRolled--;
+
+            // Find position of next tile (centered)
+            startPos = transform.position;
+            GameObject nextTile = gm.GetComponent<GameManagerScript>().tilesList[mod((locationIndex - lastRolled), len)];
+            if (nextTile.transform.childCount > 0)
+                targetPos = nextTile.transform.GetChild(1).position;
+            else
+                targetPos = nextTile.transform.position;
+
+            // Reset time to move
+            elapsedTime = 0;
+            state = State.Animation;
+        }
+
+        if (state == State.OnTile)
+            ActivateTile();
+
+        if (state == State.Finished)
             EndTurn();
     }
 
-    // Moves player to target destination
-    private void MovePlayer(int rolled)
+    // Handle animations
+    private void LateUpdate()
     {
-        // finds how many tiles on board
-        int len = gm.GetComponent<GameManagerScript>().tilesList.Length;
-
-        // Move tile by tile
-        StartCoroutine(SmoothMovement(rolled, len));
-    }
-
-    // Moves player to each tile smoothly
-    private IEnumerator SmoothMovement(int distToMove, int numTiles)
-    {
-        // Wait until previous roll is finished before moving (multiple instances)
-        while (stillMoving)
-            yield return new WaitForSeconds(0.1f);
-   
-        stillMoving = true;
-
-        // Move player tile by tile
-        for (int i = 1; i <= distToMove; i++)
-        {
-            Vector3 targetPos;
-            GameObject targetTile = gm.GetComponent<GameManagerScript>().tilesList[(locationIndex + i) % numTiles];
-            
-            // Find target position
-            if (targetTile.transform.childCount > 0)
-                targetPos = targetTile.transform.GetChild(1).position;
-            else
-                targetPos = targetTile.transform.position;
-
-            StartCoroutine(MoveOverSeconds(targetPos, moveTime));
-            yield return new WaitForSeconds(moveTime + 0.1f);
-        }
-
-        // Update player's location after move
-        locationIndex = (locationIndex + distToMove) % numTiles;
-        stillMoving = false;
-    }
-
-    // Moves a player uniformly from one location to another
-    private IEnumerator MoveOverSeconds(Vector3 end, float  desiredTime)
-    {
-        float elapsedTime = 0;
-        Vector3 startPos = transform.position;
-
         // Move player by time
-        while (elapsedTime < desiredTime)
+        if (elapsedTime < moveTime)
         {
-            transform.position = Vector3.Lerp(startPos, end, (elapsedTime / desiredTime));
+            transform.position = Vector3.Lerp(startPos, targetPos, (elapsedTime / moveTime));
             elapsedTime += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
         }
+        else if (state == State.Animation)
+            state = State.Moving;
+    }
 
-        transform.position = end;
+    // Tile specific occurences and/ or buying tiles
+    private void ActivateTile()
+    {
+        // Find tile and activate it
+        gm.GetComponent<GameManagerScript>().tilesList[locationIndex].GetComponent<TileScript>().Activate();
+
+        // If double, roll again
+        if (die.isDouble())
+            state = State.Active;
+        else
+            state = State.Finished;
     }
 
     // Ends player turn
     private void EndTurn()
     {
-        state = State.Waiting;
+        SetWaiting();
         //button.SetActive(false); // Client side
         gm.NextTurn();
     }
+
+
+
+
+    /*             ADDITIONAL METHODS                */
+
 
     // Request trade from another player, return true if accepted, false otherwise
     public bool RequestTrade(int playerReciever)
@@ -212,6 +230,75 @@ public class PlayerScript : MonoBehaviour
         */
     }
 
+    // ADD a value to the cash amount
+    public void AddCash(int cash)
+    {
+        this.cash += cash;
+    }
+    
+    public void UpdateText()
+    {
+        string s = playerName + " cash: $" + cash;
+        s += "\n";
+        s += "properties: " + numProperties;
+        if (ownedTiles.Count != 0)
+        {
+            s += "\nOwned Properties:\n";
+            foreach(GameObject tile in ownedTiles)
+            {
+                s += " " + tile.name + "\n";
+            }
+        }
+    }
+
+    // Need for when modding negative numbers
+    private int mod(int a, int b)
+    {
+        return (a % b + b) % b;
+    }
+
+    // Called when populating player panel
+    public string PlayerInfo()
+    {
+        string s = "Player > " + playerName + "\n\n";
+        
+        s = "Cash: \n\t$" + cash + "\n\n";
+
+        s += "Owned properties: \n";
+        for (int i = 0; i < numProperties; i++)
+            s += "\t" + ownedTiles[i].GetComponent<TileScript>().GetName() + "\n";
+        s += "\n";
+
+        return s;
+    }
+
+
+
+
+    /*          GETTERS AND SETTERS           */
+
+    // To be set once game starts. 
+    public void SetPlayerIndex(int index)
+    {
+        this.playerIndex = index;
+    }
+
+    public void SetName(string name)
+    {
+        playerName = name;
+    }
+
+    public string GetName()
+    {
+        return playerName;
+    }
+
+    // Returns entire list of owned tiles
+    public List<GameObject> GetOwnedTiles()
+    {
+        return ownedTiles;
+    }
+
     public int GetIndex()
     {
         return playerIndex;
@@ -228,30 +315,13 @@ public class PlayerScript : MonoBehaviour
         this.cash = cash;
     }
 
-    // ADD a value to the cash amount
-    public void AddCash(int cash)
+    public void IncNumProp()
     {
-        this.cash += cash;
+        numProperties++;
     }
 
-    
-    public void UpdateText()
+    public void DecNumProp()
     {
-        playerInfoText.text = playerName + " cash: $" + cash;
-        playerInfoText.text += "\n";
-        playerInfoText.text += "properties: " + numProperties;
-        if (ownedTiles.Count != 0)
-        {
-            playerInfoText.text += "\nOwned Properties:\n";
-            foreach(GameObject tile in ownedTiles)
-            {
-                playerInfoText.text += " " + tile.name + "\n";
-            }
-        }
-    }
-    
-    public void SetPlayerIndex(int index)
-    {
-        this.playerIndex = index;
+        numProperties--;
     }
 }

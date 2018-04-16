@@ -45,6 +45,7 @@ public class DieScript : MonoBehaviour
         if (isDouble())
             gm.IncDouble();
 
+        Debug.Log("Rolled: " + (die1 + die2) + (isDouble()? " DOUBLE": ""));
         return die1 + die2;
     }
 

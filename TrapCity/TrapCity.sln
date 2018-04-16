@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrapCity", "TrapCity.csproj", "{77A1108B-1E1A-EE4E-8A67-175CB2434E5D}"
 EndProject
 Global
