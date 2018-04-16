@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class RailroadScript : TileScript, IBuyTile
 {
@@ -13,8 +14,13 @@ public class RailroadScript : TileScript, IBuyTile
     private int rentIndex;
     private bool isMortgaged;
     private GameObject owner;
+    private GameManagerScript gm;
 
-
+    public void Start()
+    {
+        owner = null;
+        gm = GameManagerScript.instance();
+    }
 
 
     /*             IBUYTILE INTERFACE                */
@@ -23,6 +29,17 @@ public class RailroadScript : TileScript, IBuyTile
     public bool IsOwned()
     {
         return true;
+    }
+
+    // Upgrade the property by updating its price and house/hotel sprites.
+    public void Upgrade()
+    {
+        if (rentIndex != rent.Length)
+        {
+            rentIndex++;
+        }
+
+        // Add upgrade sprite?
     }
 
     //Set the owner.
@@ -74,7 +91,37 @@ public class RailroadScript : TileScript, IBuyTile
     // Buy tile option
     public override void Activate()
     {
-        Debug.Log("You landed on a railroad");
+        Debug.Log(gm.GetCurrentPlayer().name + " has landed on " + tileName);
+
+        if (owner == null)
+        {
+            bool response = EditorUtility.DisplayDialog(tileName, ("Would you like to buy this tile for " + buyCost + "?"), "Yes", "No");
+
+            // If they did want to buy
+            if (response == true)
+            {
+                GameObject player = gm.GetComponent<GameManagerScript>().GetCurrentPlayer();
+                int playerCash = player.GetComponent<PlayerScript>().GetCash();
+
+                if (playerCash < buyCost)
+                {
+                    Debug.Log("You don't have enough money");
+                    return;
+                }
+
+                // Update player's cash and add to their ownership
+                player.GetComponent<PlayerScript>().SetCash(playerCash - buyCost);
+                player.GetComponent<PlayerScript>().GetOwnedTiles().Add(gameObject);
+                player.GetComponent<PlayerScript>().IncNumProp();
+                owner = player;
+                Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
+            }
+            else
+            {
+                Debug.Log(gm.GetCurrentPlayer().name + "didn't buy" + tileName);
+                // auction
+            }
+        }
     }
 
     // Displaying tile info

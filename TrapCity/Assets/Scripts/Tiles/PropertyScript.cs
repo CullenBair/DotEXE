@@ -94,6 +94,7 @@ public class PropertyScript : TileScript, IBuyTile
     // Buying process
     public override void Activate()
     {
+        Debug.Log(gm.GetCurrentPlayer().name + " has landed on " + tileName);
          // If the tile doesn't have an owner, ask to buy
         if (owner == null)
         {
@@ -116,7 +117,12 @@ public class PropertyScript : TileScript, IBuyTile
                 player.GetComponent<PlayerScript>().GetOwnedTiles().Add(gameObject);
                 player.GetComponent<PlayerScript>().IncNumProp();
                 owner = player;
-                Debug.Log("Player has bought this property!");
+                Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
+            }
+            else
+            {
+                Debug.Log(gm.GetCurrentPlayer().name + "didn't buy" + tileName);
+                // auction
             }
         }
     }
