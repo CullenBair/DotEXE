@@ -1,4 +1,5 @@
 // Joe and Jared
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,7 +35,7 @@ public class GameManagerScript : MonoBehaviour
     private int currentPlayerIndex;     // Index of player in playerList
     private int lastPlayerIndex;
     private int numOfDoubles;
-    private int numOfPlayers = 6;
+    private int numOfPlayers = 2;
     private const int MAX_PLAYERS = 6;
 
 
@@ -161,7 +162,6 @@ public class GameManagerScript : MonoBehaviour
     // Starts next player's turn
     public void NextTurn()
     {
-        lastPlayerIndex = currentPlayerIndex;
         currentPlayerIndex = (currentPlayerIndex + 1) % playerList.Length;
         numOfDoubles = 0;
         playerList[currentPlayerIndex].GetComponent<PlayerScript>().StartTurn();
@@ -196,9 +196,28 @@ public class GameManagerScript : MonoBehaviour
         numOfDoubles++;
     }
 
-    public void WriteToPlayerPanel()
+    // Handling pay me logic
+    public void PayMe()
     {
+        // If last player to go has landed on an owned property
+        int lastPlayerLoc = playerList[lastPlayerIndex].GetComponent<PlayerScript>().GetLocIndex();
 
+        // If tile doesn't implement IBuyTile, avoid error
+        bool isOwned = false;
+        try 
+        {
+            isOwned = tilesList[lastPlayerLoc].GetComponent<IBuyTile>().IsOwned();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Tile cannot be owned!");
+        }
+
+        // Pay money!
+        if (isOwned)
+        {
+            tilesList[lastPlayerLoc].GetComponent<IBuyTile>().PayPlayer(playerList[lastPlayerIndex]);
+        }
     }
 
 
@@ -219,6 +238,11 @@ public class GameManagerScript : MonoBehaviour
     public int GetLastPlayerIndex()
     {
         return lastPlayerIndex;
+    }
+
+    public void SetLastPlayerIndex(int lpi)
+    {
+        lastPlayerIndex = lpi;
     }
 
     public int GetNumPlayers()
