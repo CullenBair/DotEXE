@@ -23,7 +23,6 @@ public class PlayerScript : MonoBehaviour
 
     // Movement
     private int lastRolled;
-    private float waitTime;
     private float moveTime;
     private float elapsedTime;
     private Vector3 startPos;
@@ -69,7 +68,6 @@ public class PlayerScript : MonoBehaviour
     public void StartTurn()
     {
         state = State.Active;
-        waitTime = 1.00f;
         // rollButton.SetActive(true);
         // Enable trading
     }
@@ -77,15 +75,14 @@ public class PlayerScript : MonoBehaviour
     // Rolling state
     public void Roll()
     {
-        // Only roll when its the players turn and they've waited
-        if (state != State.Active || waitTime > 0)
+        // Only roll when its the players turn
+        if (state != State.Active)
             return;
 
         // Disable trading
         // payMeButton.SetActive(false);
 
         lastRolled = die.RollDie();
-        gm.GetComponent<GameManagerScript>().SetLastPlayerIndex(playerIndex);
 
         // Check for triple doubles, go to jail
         if (gm.GetNumDoubles() >= 3)
@@ -112,10 +109,6 @@ public class PlayerScript : MonoBehaviour
     // Moving State
     void Update()
     {
-        // Reduce time to wait before able to roll
-        if (waitTime > 0)
-            waitTime -= Time.deltaTime;
-
         if (state == State.Moving)
         {
             // finds how many tiles on board
@@ -179,8 +172,6 @@ public class PlayerScript : MonoBehaviour
     // Ends player turn
     private void EndTurn()
     {
-        if (cash <= 0 && numProperties <= 0)
-            Debug.Log(playerName + " has lost!");
         SetWaiting();
         //button.SetActive(false); // Client side
         gm.NextTurn();
@@ -214,21 +205,37 @@ public class PlayerScript : MonoBehaviour
         return false;
     }
 
+    // returns money from player requested
+    public void PayMe()
+    {
+        // Note: will have to check for if the tile belongs to the interface
+        // IBuyTileScript, otherwise the tile will not have the GetRent function
+        // as it is a method of the interface, not TileScript.
+
+        /*
+        // Looks for any money to be gained (penality if can't)
+        int propLocationIndex = gm.GetPlayerList()[gm.GetLastPlayerIndex()].GetComponent<PlayerScript>().playerLocationIndex;
+        TileScript lastPlayerLocation = board.GetTile(propLocationIndex).GetComponent<TileScript>();
+        if (lastPlayerLocation.GetOwner().GetComponent<PlayerScript>().GetIndex() == this.playerIndex)
+        {
+            //gets money
+            cash += lastPlayerLocation.GetRent();
+            //make other player pay
+        }
+        else
+        {
+            //placeholder for penalty for pressing pay me when you shouldn't
+            cash -= 50;
+        }
+        */
+    }
+
     // ADD a value to the cash amount
     public void AddCash(int cash)
     {
         this.cash += cash;
     }
     
-    // REMOVE a value from cash
-    public void RemvCash(int cash)
-    {
-        if (this.cash - cash < 0)
-            Debug.Log("This player doesn't have enough money to pay D:");
-        else
-            this.cash -= cash;
-    }
-
     public void UpdateText()
     {
         string s = playerName + " cash: $" + cash;
@@ -242,6 +249,12 @@ public class PlayerScript : MonoBehaviour
                 s += " " + tile.name + "\n";
             }
         }
+    }
+
+    // Need for when modding negative numbers
+    private int mod(int a, int b)
+    {
+        return (a % b + b) % b;
     }
 
     // Called when populating player panel
@@ -259,12 +272,6 @@ public class PlayerScript : MonoBehaviour
         return s;
     }
 
-    // Need for when modding negative numbers
-    private int mod(int a, int b)
-    {
-        return (a % b + b) % b;
-    }
-
 
 
 
@@ -276,19 +283,14 @@ public class PlayerScript : MonoBehaviour
         this.playerIndex = index;
     }
 
-    public int GetPlayerIndex()
-    {
-        return playerIndex;
-    }
-
-    public int GetLocIndex()
-    {
-        return locationIndex;
-    }
-
     public void SetName(string name)
     {
         playerName = name;
+    }
+
+    public void SetLocIndex(int index) 
+    {
+        this.locationIndex = index;
     }
 
     public string GetName()

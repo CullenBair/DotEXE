@@ -19,21 +19,20 @@ public class PropertyScript : TileScript, IBuyTile
 
     public void Start()
     {
+        owner = null;
         gm = GameManagerScript.instance();
     }
 
     // Upgrade the property by updating its price and house/hotel sprites.
     public void Upgrade()
     {
-        if (owner.GetComponent<PlayerScript>().GetCash() < upgradeCost)
-            Debug.Log("Oh no, player doesn't have enough money to upgrade.");
-        else
-            owner.GetComponent<PlayerScript>().RemvCash(upgradeCost);
-
-        if (rentIndex < rent.Length - 1)
+        if (rentIndex != rent.Length)
+        {
             rentIndex++;
-    }
+        }
 
+        // Add upgrade sprite?
+    }
 
 
 
@@ -42,28 +41,20 @@ public class PropertyScript : TileScript, IBuyTile
     //Is it owned?
     public bool IsOwned()
 	{
-		return (owner != null);
+		return true;
 	}
 
-	// Set the owner.
-	public void SetOwner(GameObject player)
+	//Set the owner.
+	public void SetOwner(PlayerScript player)
 	{
-        owner = player;
+		//
 	}
 
-    // Return owner
-    public GameObject GetOwner()
-    {
-        return owner;
-    }
-
-	//Pay the player when pay me button has been pressed
-	public void PayPlayer(GameObject payer)
+	//Pay the player.
+	public void PayPlayer(PlayerScript player)
 	{
-        payer.GetComponent<PlayerScript>().RemvCash(GetRent());
-		owner.GetComponent<PlayerScript>().AddCash(GetRent());
-        Debug.Log(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
-    }
+		player.AddCash(GetRent());
+	}
 
 	// This property is now mortgaged.
 	public void ToMortgaged()
@@ -122,10 +113,10 @@ public class PropertyScript : TileScript, IBuyTile
                 }
 
                 // Update player's cash and add to their ownership
-                player.GetComponent<PlayerScript>().RemvCash(buyCost);
+                player.GetComponent<PlayerScript>().SetCash(playerCash - buyCost);
                 player.GetComponent<PlayerScript>().GetOwnedTiles().Add(gameObject);
                 player.GetComponent<PlayerScript>().IncNumProp();
-                this.owner = player;
+                owner = player;
                 Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
             }
             else

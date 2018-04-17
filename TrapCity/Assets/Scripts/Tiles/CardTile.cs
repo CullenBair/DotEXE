@@ -19,10 +19,11 @@ public class CardTile : TileScript
     // Pull a card
     public override void Activate()
     {
-        Debug.Log("You've pulled a card!");
+        //Debug.Log("You've pulled a card!");
         // need to access script component to get custom methods
         // (GetCard returns the GameObject, not CardScript)
-        //gm.GetCard().GetComponent<CardScript>().Activate();
+        gm.GetCard().GetComponent<CardScript>().Activate();
+        return;
     }
 
     // Displaying tile info

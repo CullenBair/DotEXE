@@ -6,7 +6,7 @@ public class GoToJailScript : TileScript
 {
     public string descript;
     private GameObject player;
-
+    private GameManagerScript gm;
 
 
     /*             TILESCRIPT INHERITANCE                */
@@ -15,11 +15,17 @@ public class GoToJailScript : TileScript
     public override void Activate()
     {
         Debug.Log("Get yo ass to jail");
+        gm.GetCurrentPlayer().GetComponent<PlayerScript>().SetLocIndex(10);
+        gm.GetCurrentPlayer().GetComponent<PlayerScript>().transform.position = gm.GetTile(10).transform.position;
     }
 
     // Displaying tile info
     public override string TileInfo()
     {
         return descript;
+    }
+    private void Start()
+    {
+        gm = GameManagerScript.instance();
     }
 }

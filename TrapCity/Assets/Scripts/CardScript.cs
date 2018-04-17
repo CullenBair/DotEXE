@@ -4,12 +4,12 @@ using UnityEngine;
 
 public abstract class CardScript : MonoBehaviour
 {
-    public GameObject gm;
+    //private GameManagerScript gm;
 
-    string cardName;
-    bool useImmediately;
-    string text;
+    public string cardName;
+    public bool useImmediately;
+    public string text;
 
     public abstract void Activate();
-
+        
 }

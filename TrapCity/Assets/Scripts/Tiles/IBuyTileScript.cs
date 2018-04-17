@@ -7,15 +7,11 @@ using UnityEngine;
 public interface IBuyTile
 {
 	bool IsOwned();
-    GameObject GetOwner();
-	void SetOwner(GameObject player);
-
-	void PayPlayer(GameObject payer);
-
+	void SetOwner(PlayerScript player);
+	void PayPlayer(PlayerScript player);
 	void ToMortgaged();
-    void FromMortgaged();
+	void FromMortgaged();
 	bool GetIsMortgaged();
-
     int GetCost();
 	int GetRent();
 }

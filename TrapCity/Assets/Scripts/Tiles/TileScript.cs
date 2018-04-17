@@ -1,7 +1,8 @@
-﻿// Joe and Jared
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+// Joseph Peaden
 
 public abstract class TileScript : MonoBehaviour {
 

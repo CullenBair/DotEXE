@@ -39,6 +39,9 @@ public class DieScript : MonoBehaviour
     // Rolls two dice, upadtes previous die roll and possibly calls incDouble in gamemanager
     public int RollDie(int numSides)
     {
+        //REMOVE THESE TWO LINES
+        gm.IncDouble();
+        return 2;
         die1 = Random.Range(1, numSides + 1);
         die2 = Random.Range(1, numSides + 1);
 
