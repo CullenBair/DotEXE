@@ -26,8 +26,6 @@ public class PlayerInfoButtonScript : MonoBehaviour
 
     public void WriteToPlayerPanel()
     {
-        gm.info_player = player;
         text.text = player.GetComponent<PlayerScript>().PlayerInfo();
-        Debug.Log(name);
     }
 }

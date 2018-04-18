@@ -25,6 +25,7 @@ public class GameManagerScript : MonoBehaviour
     public GameObject[] tilesList;      // Tiles manually placed in Array
     public GameObject[] playerInfoButtons;
 
+    public Button sellTileButton;
     public Button emptyTile;            // Base tile button before hooked up
     public GameObject tileButtons;      // Where tile buttons get placed
     public Text console;                // Where tiles get their methods from
@@ -37,7 +38,6 @@ public class GameManagerScript : MonoBehaviour
     private int numOfPlayers = 6;
     private const int MAX_PLAYERS = 6;
     public GameObject tradeWindow;
-    public GameObject info_player;
 
 
 
@@ -135,6 +135,13 @@ public class GameManagerScript : MonoBehaviour
             spawn.GetComponent<TileButtonScript>().SetTileNum(i);
             spawn.GetComponent<TileButtonScript>().SetTextObject(console);
 
+            try
+            {
+                if (tilesList[i].tag == "PropertyTile")
+                    spawn.GetComponentInChildren<Text>().text = "0";
+            }
+            catch { }
+
             // Set parent to linked object and place in array
             spawn.transform.SetParent(tileButtons.transform);
         }
@@ -210,6 +217,8 @@ public class GameManagerScript : MonoBehaviour
     }
 
 
+
+
     /*        GETTERS AND SETTERS       */
 
     public int GetNumDoubles()
@@ -245,5 +254,10 @@ public class GameManagerScript : MonoBehaviour
     public GameObject GetTile(int index)
     {
         return tilesList[index];
+    }
+
+    public void SetSellTileButton(int index)
+    {
+        sellTileButton.GetComponent<SellButtonScript>().SetLastTileIndex(index);
     }
 }

@@ -18,7 +18,7 @@ public class PlayerScript : MonoBehaviour
     private int oldIndex;       // used when moving player
 
     // State 
-    private enum State { Waiting, Active, Moving, Animation, OnTile, Finished };
+    private enum State { Waiting, Active, Moving, Animation, OnTile, Jail, Finished };
     State state;
 
     // Movement
@@ -67,6 +67,10 @@ public class PlayerScript : MonoBehaviour
     // Active state
     public void StartTurn()
     {
+        if(state == State.Jail)
+        {
+            Jail();
+        }
         state = State.Active;
         // rollButton.SetActive(true);
         // Enable trading
@@ -89,7 +93,7 @@ public class PlayerScript : MonoBehaviour
         {
             locationIndex = 10;
             transform.position = gm.GetTile(10).transform.position;
-            state = State.Finished;
+            state = State.Jail;
             return;
         }
 
@@ -141,6 +145,7 @@ public class PlayerScript : MonoBehaviour
 
         if (state == State.Finished)
             EndTurn();
+
     }
 
     // Handle animations
@@ -167,6 +172,26 @@ public class PlayerScript : MonoBehaviour
             state = State.Active;
         else
             state = State.Finished;
+    }
+
+    private void Jail()
+    {
+        if (timeInJail >= 3)
+        {
+            timeInJail = 0;
+            cash -= 50;
+        }
+        //ask player if they want to spend 50 to get out of jail instantly
+        /* if yes
+        if()
+        {
+            state = State.Active;
+            timeInJail = 0;
+            Roll();
+        }       
+         */
+         //if no
+
     }
 
     // Ends player turn

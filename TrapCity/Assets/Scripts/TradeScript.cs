@@ -33,8 +33,6 @@ public class TradeScript : MonoBehaviour {
 
 	void OnEnable()
 	{
-		// need reference to player
-		//StartTrade(GameManagerScript.instance().info_player);
 		// add player properties to dropdown
 		// UpdateDropDown();
 	}
