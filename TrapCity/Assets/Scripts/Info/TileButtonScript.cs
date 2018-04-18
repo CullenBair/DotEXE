@@ -31,9 +31,6 @@ public class TileButtonScript : MonoBehaviour
 
     public void WriteTileToConsole()
     {
-        // Tell sell button which tile was last selected
-        gm.SetSellTileButton(tileNum);
-
         // Get tile info should come from
         GameObject tile = gm.GetComponent<GameManagerScript>().GetTile(tileNum);
         t.GetComponent<Text>().text = "Console > " + tile.GetComponent<TileScript>().GetName() + "\n\n";

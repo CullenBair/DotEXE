@@ -1,4 +1,5 @@
 // Joe and Jared
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +26,6 @@ public class GameManagerScript : MonoBehaviour
     public GameObject[] tilesList;      // Tiles manually placed in Array
     public GameObject[] playerInfoButtons;
 
-    public Button sellTileButton;
     public Button emptyTile;            // Base tile button before hooked up
     public GameObject tileButtons;      // Where tile buttons get placed
     public Text console;                // Where tiles get their methods from
@@ -35,9 +35,8 @@ public class GameManagerScript : MonoBehaviour
     private int currentPlayerIndex;     // Index of player in playerList
     private int lastPlayerIndex;
     private int numOfDoubles;
-    private int numOfPlayers = 6;
+    private int numOfPlayers = 2;
     private const int MAX_PLAYERS = 6;
-    public GameObject tradeWindow;
 
 
 
@@ -47,8 +46,7 @@ public class GameManagerScript : MonoBehaviour
     {
         // Gets all "Card" objects in scene as an array, shuffle, and convert to queue
         GameObject[] deckArray = GameObject.FindGameObjectsWithTag("Card");
-        //deck = new Queue<GameObject>(Shuffle(deckArray));
-        deck = new Queue<GameObject>(deckArray);
+        deck = new Queue<GameObject>(Shuffle(deckArray));
 
         CreatePlayers();
         SpawnTileButtons();
@@ -135,13 +133,6 @@ public class GameManagerScript : MonoBehaviour
             spawn.GetComponent<TileButtonScript>().SetTileNum(i);
             spawn.GetComponent<TileButtonScript>().SetTextObject(console);
 
-            try
-            {
-                if (tilesList[i].tag == "PropertyTile")
-                    spawn.GetComponentInChildren<Text>().text = "0";
-            }
-            catch { }
-
             // Set parent to linked object and place in array
             spawn.transform.SetParent(tileButtons.transform);
         }
@@ -171,7 +162,6 @@ public class GameManagerScript : MonoBehaviour
     // Starts next player's turn
     public void NextTurn()
     {
-        lastPlayerIndex = currentPlayerIndex;
         currentPlayerIndex = (currentPlayerIndex + 1) % playerList.Length;
         numOfDoubles = 0;
         playerList[currentPlayerIndex].GetComponent<PlayerScript>().StartTurn();
@@ -206,14 +196,28 @@ public class GameManagerScript : MonoBehaviour
         numOfDoubles++;
     }
 
-    public void WriteToPlayerPanel()
+    // Handling pay me logic
+    public void PayMe()
     {
+        // If last player to go has landed on an owned property
+        int lastPlayerLoc = playerList[lastPlayerIndex].GetComponent<PlayerScript>().GetLocIndex();
 
-    }
+        // If tile doesn't implement IBuyTile, avoid error
+        bool isOwned = false;
+        try 
+        {
+            isOwned = tilesList[lastPlayerLoc].GetComponent<IBuyTile>().IsOwned();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Tile cannot be owned!");
+        }
 
-    public void EnableTradeWindow()
-    {
-        tradeWindow.SetActive(true);
+        // Pay money!
+        if (isOwned)
+        {
+            tilesList[lastPlayerLoc].GetComponent<IBuyTile>().PayPlayer(playerList[lastPlayerIndex]);
+        }
     }
 
 
@@ -236,6 +240,11 @@ public class GameManagerScript : MonoBehaviour
         return lastPlayerIndex;
     }
 
+    public void SetLastPlayerIndex(int lpi)
+    {
+        lastPlayerIndex = lpi;
+    }
+
     public int GetNumPlayers()
     {
         return numOfPlayers;
@@ -254,10 +263,5 @@ public class GameManagerScript : MonoBehaviour
     public GameObject GetTile(int index)
     {
         return tilesList[index];
-    }
-
-    public void SetSellTileButton(int index)
-    {
-        sellTileButton.GetComponent<SellButtonScript>().SetLastTileIndex(index);
     }
 }

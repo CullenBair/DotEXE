@@ -7,11 +7,12 @@ using UnityEditor;
 public class RailroadScript : TileScript, IBuyTile
 {
     public int buyCost;
-    public int[] rent;
+    public int rent = 25;
     public int mortgageValue;
     public GameObject[] linkedTiles;
 
-    private int rentIndex;
+    private int[] multiplier = { 1, 2, 4, 8 };
+    private int multIndex;
     private bool isMortgaged;
     private GameObject owner;
     private GameManagerScript gm;
@@ -22,36 +23,54 @@ public class RailroadScript : TileScript, IBuyTile
         gm = GameManagerScript.instance();
     }
 
+    // Upgrade the property by updating its multiplier
+    public void Upgrade()
+    {
+        if (multIndex < multiplier.Length - 1)
+            multIndex++;
+    }
+
+
+
 
     /*             IBUYTILE INTERFACE                */
 
     //Is it owned?
     public bool IsOwned()
     {
-        return true;
+        return (owner != null);
     }
 
-    // Upgrade the property by updating its price and house/hotel sprites.
-    public void Upgrade()
+    // Set the owner and multipler amount
+    public void SetOwner(GameObject player)
     {
-        if (rentIndex != rent.Length)
+        multIndex = 0;
+
+        for (int i = 0; i < linkedTiles.Length; i++)
         {
-            rentIndex++;
+            if (player == linkedTiles[i].GetComponent<IBuyTile>().GetOwner())
+            {
+                linkedTiles[i].GetComponent<RailroadScript>().Upgrade();
+                Upgrade();
+            }
         }
 
-        // Add upgrade sprite?
+        owner = player;
     }
 
-    //Set the owner.
-    public void SetOwner(PlayerScript player)
+
+    // Return owner
+    public GameObject GetOwner()
     {
-        //
+        return owner;
     }
 
-    //Pay the player.
-    public void PayPlayer(PlayerScript player)
+    //Pay the player when pay me button has been pressed
+    public void PayPlayer(GameObject payer)
     {
-        player.SetCash(player.GetCash() + GetRent());
+        payer.GetComponent<PlayerScript>().RemvCash(GetRent());
+        owner.GetComponent<PlayerScript>().AddCash(GetRent());
+        Debug.Log(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
     }
 
     //This property is now mortgaged.
@@ -75,7 +94,7 @@ public class RailroadScript : TileScript, IBuyTile
     //Return the propety's current rent.
     public int GetRent()
     {
-        return rent[rentIndex];
+        return rent * multiplier[multIndex];
     }
 
     // Return price of tile
@@ -86,13 +105,12 @@ public class RailroadScript : TileScript, IBuyTile
 
 
 
+
     /*             TILESCRIPT INHERITANCE                */
 
     // Buy tile option
     public override void Activate()
     {
-        Debug.Log(gm.GetCurrentPlayer().name + " has landed on " + tileName);
-
         if (owner == null)
         {
             bool response = EditorUtility.DisplayDialog(tileName, ("Would you like to buy this tile for " + buyCost + "?"), "Yes", "No");
@@ -113,7 +131,7 @@ public class RailroadScript : TileScript, IBuyTile
                 player.GetComponent<PlayerScript>().SetCash(playerCash - buyCost);
                 player.GetComponent<PlayerScript>().GetOwnedTiles().Add(gameObject);
                 player.GetComponent<PlayerScript>().IncNumProp();
-                owner = player;
+                SetOwner(player);
                 Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
             }
             else
@@ -130,8 +148,8 @@ public class RailroadScript : TileScript, IBuyTile
         string s = "Purchase cost: \n\t$" + buyCost + "\n\n";
 
         s += "Rent price: \n";
-        for (int i = 0; i < rent.Length; i++)
-            s += "\t$" + rent[i] + "\n";
+        for (int i = 0; i < multiplier.Length; i++)
+            s += "\t$" + (rent * multiplier[i]) + "\n";
         s += "\n";
 
         s += "Mortgage value: \n\t$" + mortgageValue + "\n\n";
