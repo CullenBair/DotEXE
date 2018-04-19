@@ -15,7 +15,6 @@ public interface IBuyTile
 	void ToMortgaged();
     void FromMortgaged();
 	bool GetIsMortgaged();
-    void Mortgage();
 
     int GetCost();
 	int GetRent();

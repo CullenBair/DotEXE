@@ -17,7 +17,8 @@ public class GOScript : TileScript
 
     public override void Activate()
     {
-        Debug.Log("You're on GO");
+        Debug.Log("You're on GO.");
+		InfoScript.instance().Displayer("You're on GO.");
     }
 
     // Displaying tile info

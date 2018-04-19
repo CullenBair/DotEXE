@@ -31,7 +31,8 @@ public class JailScript : TileScript
     // standard activation method
     public override void Activate()
     {
-        Debug.Log("You're visiting jail");
+        Debug.Log("You're visiting jail.");
+		InfoScript.instance().Displayer("You're visiting jail.");
     }
 
     // Displaying tile info

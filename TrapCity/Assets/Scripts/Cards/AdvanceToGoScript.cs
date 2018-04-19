@@ -8,7 +8,8 @@ public class AdvanceToGoScript : CardScript
     
     public override void Activate()
     {
-        Debug.Log("Card name = " + cardName + "\nDescription " + text);
+		Debug.Log("Card name = " + cardName + "\nDescription " + text);
+		InfoScript.instance().Displayer("Card name = " + cardName + "\nDescription " + text);
         gm.GetCurrentPlayer().GetComponent<PlayerScript>().SetLocIndex(0);
         gm.GetCurrentPlayer().GetComponent<PlayerScript>().transform.position = gm.GetTile(0).transform.position;
         gm.GetCurrentPlayer().GetComponent<PlayerScript>().AddCash(200);
