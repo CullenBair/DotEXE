@@ -180,11 +180,8 @@ public class PlayerScript : MonoBehaviour
     // Ends player turn
     private void EndTurn()
     {
-		if (cash <= 0 && numProperties <= 0) 
-		{
-			Debug.Log(playerName + " has lost!");
-			InfoScript.instance().Displayer(playerName + " has lost!");
-		}
+        if (cash <= 0 && numProperties <= 0)
+            Debug.Log(playerName + " has lost!");
         SetWaiting();
         //button.SetActive(false); // Client side
         gm.NextTurn();
@@ -227,11 +224,8 @@ public class PlayerScript : MonoBehaviour
     // REMOVE a value from cash
     public void RemvCash(int cash)
     {
-		if (this.cash - cash < 0)
-		{
-			Debug.Log ("This player doesn't have enough money to pay D:");
-			InfoScript.instance().Displayer("This player doesn't have enough money to pay D:");
-		}
+        if (this.cash - cash < 0)
+            Debug.Log("This player doesn't have enough money to pay D:");
         else
             this.cash -= cash;
     }

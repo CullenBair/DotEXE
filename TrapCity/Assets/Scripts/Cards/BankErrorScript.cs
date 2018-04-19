@@ -8,8 +8,7 @@ public class BankErrorScript : CardScript
 
     public override void Activate()
     {
-		Debug.Log("card name = " + cardName + "\nDescription " + text);
-		InfoScript.instance().Displayer("card name = " + cardName + "\nDescription " + text);
+        Debug.Log("card name = " + cardName + "\nDescription " + text);
         gm.GetCurrentPlayer().GetComponent<PlayerScript>().AddCash(200);
     }
 

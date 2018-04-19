@@ -8,8 +8,7 @@ public class GrandOperaNight : CardScript {
 
     public override void Activate()
     {
-		Debug.Log("card name = " + cardName + "\nDescription " + text);
-		InfoScript.instance().Displayer("card name = " + cardName + "\nDescription " + text);
+        Debug.Log("card name = " + cardName + "\nDescription " + text);
         int x = 0;
         //take 50 from every player and give to current player
 
