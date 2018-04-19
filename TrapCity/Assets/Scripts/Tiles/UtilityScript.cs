@@ -49,8 +49,7 @@ public class UtilityScript : TileScript, IBuyTile
         {
             if (player == linkedTiles[i].GetComponent<IBuyTile>().GetOwner())
             {
-                Debug.Log("Same owner.");
-				InfoScript.instance().Displayer("Same owner.");
+                Debug.Log("Same owners");
                 linkedTiles[i].GetComponent<UtilityScript>().Upgrade();
                 Upgrade();
             }
@@ -70,24 +69,48 @@ public class UtilityScript : TileScript, IBuyTile
     {
         payer.GetComponent<PlayerScript>().RemvCash(GetRent());
         owner.GetComponent<PlayerScript>().AddCash(GetRent());
-		Debug.Log(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
-		InfoScript.instance().Displayer(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
-	}
+        Debug.Log(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
+    }
 
-    //This property is now mortgaged.
+    // This property is now mortgaged.
     public void ToMortgaged()
-	{
-		isMortgaged = true;
-	}
+    {
+        owner.GetComponent<PlayerScript>().AddCash(mortgageValue);
+        isMortgaged = true;
+    }
 
-	//This property is now not mortgaged.
-	public void FromMortgaged()
-	{
-		isMortgaged = false;
-	}
+    // This property is now not mortgaged.
+    public void FromMortgaged()
+    {
+        owner.GetComponent<PlayerScript>().RemvCash(mortgageValue + (mortgageValue / 10));
 
-	//Is this property mortgaged?
-	public bool GetIsMortgaged()
+        isMortgaged = false;
+    }
+
+    // Decides how to handle mortgaging
+    public void Mortgage()
+    {
+        // Already mortgaged
+        if (isMortgaged == true)
+        {
+            if (owner.GetComponent<PlayerScript>().GetCash() > mortgageValue + (mortgageValue / 10))
+            {
+                Debug.Log("Bought back property from mortgage.");
+                FromMortgaged();
+                return;
+            }
+            else
+            {
+                Debug.Log("You don't have enough money to buy from mortgage.");
+                return;
+            }
+        }
+
+        ToMortgaged();
+    }
+
+    //Is this property mortgaged?
+    public bool GetIsMortgaged()
 	{
 		return isMortgaged;
 	}
@@ -104,6 +127,17 @@ public class UtilityScript : TileScript, IBuyTile
         return buyCost;
     }
 
+    // When trying to sell
+    public void SellTile()
+    {
+        if (isMortgaged == false)
+        {
+            Debug.Log("You're trying to mortgage " + tileName);
+        }
+        else
+            Debug.Log(tileName + " is already mortgaged!"); 
+    }
+
 
 
 
@@ -113,7 +147,6 @@ public class UtilityScript : TileScript, IBuyTile
     public override void Activate()
     {
         Debug.Log(gm.GetCurrentPlayer().name + " has landed on " + tileName);
-		InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " has landed on " + tileName);
         // If the tile doesn't have an owner, ask to buy
         if (owner == null)
         {
@@ -127,8 +160,7 @@ public class UtilityScript : TileScript, IBuyTile
 
                 if (playerCash < buyCost)
                 {
-                    Debug.Log("You don't have enough money.");
-					InfoScript.instance().Displayer("You don't have enough money.");
+                    Debug.Log("You don't have enough money");
                     return;
                 }
 
@@ -138,12 +170,10 @@ public class UtilityScript : TileScript, IBuyTile
                 player.GetComponent<PlayerScript>().IncNumProp();
                 SetOwner(player);
                 Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
-				InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
             }
             else
             {
-                Debug.Log(gm.GetCurrentPlayer().name + " didn't buy " + tileName);
-				InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " didn't buy " + tileName);
+                Debug.Log(gm.GetCurrentPlayer().name + "didn't buy" + tileName);
                 // auction
             }
         }

@@ -29,7 +29,6 @@ public class TaxesScript : TileScript
     public override void Activate()
     {
         Debug.Log("You've been taxed 200!");
-		InfoScript.instance().Displayer("You've been taxed 200!");
 
         /*
         if (player.GetCash() >= 200)
