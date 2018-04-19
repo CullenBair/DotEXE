@@ -1,7 +1,6 @@
 ﻿//Matthew Drabek
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;
 using UnityEngine;
 using UnityEditor;
 
@@ -23,42 +22,19 @@ public class PropertyScript : TileScript, IBuyTile
         gm = GameManagerScript.instance();
     }
 
-    // Upgrade the property
-    public void Upgrade(int index)
+    // Upgrade the property by updating its price and house/hotel sprites.
+    public void Upgrade()
     {
-        // If it can be upgraded
-        if (rentIndex >= rent.Length - 1)
-        {
-            Debug.Log("You cannot upgrade further.");
-            return;
-        }
+		if (owner.GetComponent<PlayerScript> ().GetCash () < upgradeCost)
+		{
+			Debug.Log("Oh no! Player doesn't have enough money to upgrade.");
+			InfoScript.instance().Displayer("Oh no! Player doesn't have enough money to upgrade.");
+		}
+        else
+            owner.GetComponent<PlayerScript>().RemvCash(upgradeCost);
 
-        // If player has enough money
-        if (owner.GetComponent<PlayerScript>().GetCash() < upgradeCost)
-        {
-            Debug.Log("Oh no, player doesn't have enough money to upgrade.");
-            return;
-        }
-
-
-        owner.GetComponent<PlayerScript>().RemvCash(upgradeCost);
-        rentIndex++;
-        gm.GetTileButton(index).GetComponentInChildren<Text>().text = rentIndex.ToString();
-    }
-
-    public void SellUpgrade(int index)
-    {
-        if (rentIndex <= 0)
-        {
-            Debug.Log("There are no upgrades to sell.");
-            return;
-        }
-
-        // Give player cash 
-        owner.GetComponent<PlayerScript>().AddCash(upgradeCost / 2);
-
-        rentIndex--;
-        gm.GetTileButton(index).GetComponentInChildren<Text>().text = rentIndex.ToString();
+        if (rentIndex < rent.Length - 1)
+            rentIndex++;
     }
 
 
@@ -90,47 +66,20 @@ public class PropertyScript : TileScript, IBuyTile
         payer.GetComponent<PlayerScript>().RemvCash(GetRent());
 		owner.GetComponent<PlayerScript>().AddCash(GetRent());
         Debug.Log(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
-    }
+		InfoScript.instance().Displayer(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
+	}
 
 	// This property is now mortgaged.
 	public void ToMortgaged()
 	{
-        if (rentIndex != 0)
-            Debug.Log("You need to have no upgrades to mortgage.");
-
-        owner.GetComponent<PlayerScript>().AddCash(mortgageValue);
-        isMortgaged = true;
+		isMortgaged = true;
 	}
 
 	// This property is now not mortgaged.
 	public void FromMortgaged()
 	{
-        owner.GetComponent<PlayerScript>().RemvCash(mortgageValue + (mortgageValue / 10));
-
-        isMortgaged = false;
+		isMortgaged = false;
 	}
-
-    // Decides how to handle mortgaging
-    public void Mortgage()
-    {
-        // Already mortgaged
-        if (isMortgaged == true)
-        {
-            if (owner.GetComponent<PlayerScript>().GetCash() > mortgageValue + (mortgageValue / 10))
-            {
-                Debug.Log("Bought back property from mortgage.");
-                FromMortgaged();
-                return;
-            }
-            else
-            {
-                Debug.Log("You don't have enough money to buy from mortgage.");
-                return;
-            }
-        }
-
-        ToMortgaged();
-    }
 
 	// Is this property mortgaged?
 	public bool GetIsMortgaged()
@@ -152,12 +101,14 @@ public class PropertyScript : TileScript, IBuyTile
 
 
 
+
     /*             TILESCRIPT INHERITANCE                */
 
     // Buying process
     public override void Activate()
     {
-        Debug.Log(gm.GetCurrentPlayer().name + " has landed on " + tileName);
+		Debug.Log(gm.GetCurrentPlayer().name + " has landed on " + tileName);
+		InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " has landed on " + tileName);
          // If the tile doesn't have an owner, ask to buy
         if (owner == null)
         {
@@ -171,7 +122,8 @@ public class PropertyScript : TileScript, IBuyTile
 
                 if (playerCash < buyCost)
                 {
-                    Debug.Log("You don't have enough money");
+                    Debug.Log("You don't have enough money.");
+					InfoScript.instance ().Displayer ("You don't have enough money.");
                     return;
                 }
 
@@ -180,12 +132,14 @@ public class PropertyScript : TileScript, IBuyTile
                 player.GetComponent<PlayerScript>().GetOwnedTiles().Add(gameObject);
                 player.GetComponent<PlayerScript>().IncNumProp();
                 this.owner = player;
-                Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
+				Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
+				InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
             }
             else
             {
-                Debug.Log(gm.GetCurrentPlayer().name + "didn't buy" + tileName);
-                // auction
+				Debug.Log(gm.GetCurrentPlayer().name + " didn't buy " + tileName);
+				InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " didn't buy " + tileName);
+				// auction
             }
         }
     }

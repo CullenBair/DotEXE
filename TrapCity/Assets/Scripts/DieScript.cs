@@ -46,7 +46,8 @@ public class DieScript : MonoBehaviour
             gm.IncDouble();
 
         Debug.Log("Rolled: " + (die1 + die2) + (isDouble()? " DOUBLE": ""));
-        return die1 + die2;
+		InfoScript.instance().Displayer("Rolled: " + (die1 + die2) + (isDouble () ? " DOUBLE" : ""));
+		return die1 + die2;
     }
 
     // Checks if double and sets bool

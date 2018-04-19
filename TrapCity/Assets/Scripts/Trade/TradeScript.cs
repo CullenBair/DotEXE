@@ -4,34 +4,37 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 
-public class TradeScript : MonoBehaviour {
-
+public class TradeScript : MonoBehaviour
+{
 	public GameObject p1;
 	public GameObject p2;
+	// containers holding offers from both players
+	// probabaly should only call this when player selects somemthing
+	public Text p1Offer;
+	public Text p2Offer;
+	// cash offer
+	public int p1CashOffer;
+	public int p2CashOffer;
+	//
+	public int p1TileOffer;
+	public int p2TileOffer;
 
-	// list of owned tiles and names for the dropdown
-	private List<GameObject> p2Owned;
-	private List<string> p2OwnedNames;
-	Dropdown.OptionData data = new Dropdown.OptionData();
+	private bool newUpdate;
 
-	public Dropdown prop_drop;
+	// need to add method to gamemanager to call when trade button is pressed and p2 accepts, activating this gameobject.
 
 	// p1 should be assigned from whatever way we get a reference to the local player
 	// p2 assigned by whoever is currently selected by the info panel
 
-	void Awake()
+	void Start()
 	{
-		p1 = GameManagerScript.instance().GetPlayerList()[0];
 		// update p1 with local player
 	}
 
 	void OnEnable()
 	{
-		//p1 = this.gameObject; // just for now
-		// need reference to player
-		StartTrade(GameManagerScript.instance().info_player);
 		// add player properties to dropdown
-		UpdateDropDown();
+		// UpdateDropDown();
 	}
 
 	// called from playerinfo script every time the player whos information is
@@ -43,26 +46,18 @@ public class TradeScript : MonoBehaviour {
 
 	private void UpdateDropDown()
 	{
-		prop_drop.ClearOptions();
-
-		p2Owned = p2.GetComponent<PlayerScript>().GetOwnedTiles();
-
-		if(p2Owned.Count > 0)
-		{
-			foreach(GameObject g in p2Owned)
-			{
-				data.text = g.name;
-				//p2OwnedNames.Add(g.name);
-			}
-
-			prop_drop.options.Add(data);
-			// https://docs.unity3d.com/ScriptReference/UI.Dropdown.AddOptions.html
-		}
+		// prop_drop.AddOptions()
+		// https://docs.unity3d.com/ScriptReference/UI.Dropdown.AddOptions.html
 	}
 
 	public void AcceptTrade()
 	{
 		// wait until both players press accept and
+	}
+
+	public void DeclineTrade()
+	{
+		// quit and send message to other player saying p1 denied
 	}
 
 	public void StartTrade(GameObject p2)
@@ -73,20 +68,20 @@ public class TradeScript : MonoBehaviour {
 		bool response = EditorUtility.DisplayDialog("Trade Request", (p1.name + " wants to initiate a trade with you."), "Do it!", "Nope." );
 
 		if(response == false)
-		{
-			RejectTrade();
-		}
+			// NOTE: make custom text popup instead
+			EditorUtility.DisplayDialog("Request Denied", (p2.name + " has denied your request."), "Well that sucks!", "Okay." );
 		else // display trade dialog
-			transform.GetChild(0).gameObject.SetActive(true);
+			print("not yet implemented");
 
-	}
-
-	// reject pop up window, disable this after timer
-	public void RejectTrade()
-	{
-		transform.GetChild(1).gameObject.SetActive(true);
-		transform.GetChild(1).gameObject.GetComponent<TextPopup>().DisableMe();
 	}
 
 
 }
+	//
+	// // p2 designated by player button selected in player info ui
+	// // p1 is this player
+	// // p1 clicks Trade button
+	// // Prompt p2 with dialog window
+	// //		YES: bring up trade ui for p1 and p2
+	// //		NO: send p1 dialog box saying "they said fuck u boi"
+	//

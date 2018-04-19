@@ -22,7 +22,8 @@ public class FreeParkingScript : TileScript
     // Buy tile option
     public override void Activate()
     {
-        Debug.Log("Free parking baby");
+        Debug.Log("Free parking baby!");
+		InfoScript.instance().Displayer("Free parking baby!");
     }
 
     // Displaying tile info
