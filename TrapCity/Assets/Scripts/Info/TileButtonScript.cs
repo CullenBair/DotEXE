@@ -31,9 +31,6 @@ public class TileButtonScript : MonoBehaviour
 
     public void WriteTileToConsole()
     {
-        // update upgrade, sell, and mortgage buttons
-        gm.SetUpgradeScript(tileNum);
-
         // Get tile info should come from
         GameObject tile = gm.GetComponent<GameManagerScript>().GetTile(tileNum);
         t.GetComponent<Text>().text = "Console > " + tile.GetComponent<TileScript>().GetName() + "\n\n";

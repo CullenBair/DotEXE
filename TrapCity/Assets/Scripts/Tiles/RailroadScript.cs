@@ -11,7 +11,7 @@ public class RailroadScript : TileScript, IBuyTile
     public int mortgageValue;
     public GameObject[] linkedTiles;
 
-    private int[] multiplier = { 1, 2, 4, 8 };
+    private int[] multiplier = {1, 2, 4, 8};
     private int multIndex;
     private bool isMortgaged;
     private GameObject owner;
@@ -70,44 +70,20 @@ public class RailroadScript : TileScript, IBuyTile
     {
         payer.GetComponent<PlayerScript>().RemvCash(GetRent());
         owner.GetComponent<PlayerScript>().AddCash(GetRent());
-        Debug.Log(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
-    }
+		Debug.Log(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
+		InfoScript.instance().Displayer(payer.GetComponent<PlayerScript>().GetName() + " paid " + owner.GetComponent<PlayerScript>().GetName() + " " + GetRent());
+	}
 
-    // This property is now mortgaged.
+    //This property is now mortgaged.
     public void ToMortgaged()
     {
-        owner.GetComponent<PlayerScript>().AddCash(mortgageValue);
         isMortgaged = true;
     }
 
-    // This property is now not mortgaged.
+    //This property is now not mortgaged.
     public void FromMortgaged()
     {
-        owner.GetComponent<PlayerScript>().RemvCash(mortgageValue + (mortgageValue / 10));
-
         isMortgaged = false;
-    }
-
-    // Decides how to handle mortgaging
-    public void Mortgage()
-    {
-        // Already mortgaged
-        if (isMortgaged == true)
-        {
-            if (owner.GetComponent<PlayerScript>().GetCash() > mortgageValue + (mortgageValue / 10))
-            {
-                Debug.Log("Bought back property from mortgage.");
-                FromMortgaged();
-                return;
-            }
-            else
-            {
-                Debug.Log("You don't have enough money to buy from mortgage.");
-                return;
-            }
-        }
-
-        ToMortgaged();
     }
 
     //Is this property mortgaged?
@@ -126,11 +102,6 @@ public class RailroadScript : TileScript, IBuyTile
     public int GetCost()
     {
         return buyCost;
-    }
-
-    public void SellTile()
-    {
-
     }
 
 
@@ -153,7 +124,8 @@ public class RailroadScript : TileScript, IBuyTile
 
                 if (playerCash < buyCost)
                 {
-                    Debug.Log("You don't have enough money");
+                    Debug.Log("You don't have enough money.");
+					InfoScript.instance().Displayer("You don't have enough money.");
                     return;
                 }
 
@@ -162,11 +134,13 @@ public class RailroadScript : TileScript, IBuyTile
                 player.GetComponent<PlayerScript>().GetOwnedTiles().Add(gameObject);
                 player.GetComponent<PlayerScript>().IncNumProp();
                 SetOwner(player);
-                Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
+				Debug.Log(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
+				InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " has bought " + tileName + "!");
             }
             else
             {
-                Debug.Log(gm.GetCurrentPlayer().name + "didn't buy" + tileName);
+                Debug.Log(gm.GetCurrentPlayer().name + " didn't buy " + tileName);
+				InfoScript.instance().Displayer(gm.GetCurrentPlayer().name + " didn't buy " + tileName);
                 // auction
             }
         }

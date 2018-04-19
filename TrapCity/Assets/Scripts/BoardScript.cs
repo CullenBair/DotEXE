@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoardScript : MonoBehaviour {
+public class BoardScript : MonoBehaviour
+{
 
     // The following block is singleton pattern, basically
     // it should give an access point to it from all gameobjects by calling
