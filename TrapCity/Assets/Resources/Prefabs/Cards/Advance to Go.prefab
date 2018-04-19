@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4492024254566210}
-  - component: {fileID: 114900634109797606}
+  - component: {fileID: 114529084983630074}
   m_Layer: 0
   m_Name: Advance to Go
   m_TagString: Card
@@ -40,7 +40,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114900634109797606
+--- !u!114 &114529084983630074
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -51,6 +51,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c319ef1f193178244a6cc9dd2dfdea1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardName: Advance to Go!
+  cardName: Advance to Go
   useImmediately: 1
-  text: Move to Go, Collect $200
+  text: Go to GO and collect

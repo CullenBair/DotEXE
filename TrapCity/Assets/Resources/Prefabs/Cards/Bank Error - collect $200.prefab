@@ -51,7 +51,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd8d3b0a939c7ff4087b315b007ef517, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gm: {fileID: 0}
   cardName: Bank error in your favor
   useImmediately: 1
   text: Collect $200
